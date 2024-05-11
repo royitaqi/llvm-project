@@ -174,6 +174,9 @@ void BreakpointResolver::ResolveBreakpointInModules(SearchFilter &filter,
 }
 
 void BreakpointResolver::ResolveBreakpoint(SearchFilter &filter) {
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Resolving breakpoint", "BreakpointResolver::ResolveBreakpoint()");
+
   filter.Search(*this);
 }
 

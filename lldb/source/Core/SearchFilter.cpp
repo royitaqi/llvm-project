@@ -16,6 +16,7 @@
 #include "lldb/Symbol/SymbolFile.h"
 #include "lldb/Target/Target.h"
 #include "lldb/Utility/ConstString.h"
+#include "lldb/Utility/LLDBLog.h"
 #include "lldb/Utility/Status.h"
 #include "lldb/Utility/Stream.h"
 #include "lldb/lldb-enumerations.h"
@@ -142,10 +143,15 @@ bool SearchFilter::AddressPasses(Address &address) { return true; }
 
 bool SearchFilter::CompUnitPasses(FileSpec &fileSpec) { return true; }
 
-bool SearchFilter::CompUnitPasses(CompileUnit &compUnit) { return true; }
+bool SearchFilter::CompUnitPasses(CompileUnit &compUnit) {
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Hard-coded pass", "SearchFilter::CompUnitPasses()");
+
+  return true;
+}
 
 bool SearchFilter::FunctionPasses(Function &function) {
-  // This is a slightly cheesy job, but since we don't have finer grained 
+  // This is a slightly cheesy job, but since we don't have finer grained
   // filters yet, just checking that the start address passes is probably
   // good enough for the base class behavior.
   Address addr = function.GetAddressRange().GetBaseAddress();
@@ -259,6 +265,9 @@ SearchFilter::DoModuleIteration(const SymbolContext &context,
   }
 
   for (ModuleSP module_sp : m_target_sp->GetImages().Modules()) {
+    Log *log = GetLog(LLDBLog::Roy);
+    LLDB_LOGF(log, "%50s : Iterating module %s", "SearchFilter::DoModuleIteration()", module_sp->GetFileSpec().GetFilename().GetCString());
+
     // If this is the last level supplied, then call the callback directly,
     // otherwise descend.
     if (!ModulePasses(module_sp))
@@ -700,7 +709,7 @@ bool SearchFilterByModuleListAndCU::AddressPasses(Address &address) {
     cu_spec = sym_ctx.comp_unit->GetPrimaryFile();
   if (m_cu_spec_list.FindFileIndex(0, cu_spec, false) == UINT32_MAX)
     return false; // Fails the file check
-  return SearchFilterByModuleList::ModulePasses(sym_ctx.module_sp); 
+  return SearchFilterByModuleList::ModulePasses(sym_ctx.module_sp);
 }
 
 bool SearchFilterByModuleListAndCU::CompUnitPasses(FileSpec &fileSpec) {
@@ -708,14 +717,21 @@ bool SearchFilterByModuleListAndCU::CompUnitPasses(FileSpec &fileSpec) {
 }
 
 bool SearchFilterByModuleListAndCU::CompUnitPasses(CompileUnit &compUnit) {
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Testing CU %s", "SearchFilterByModuleListAndCU::CompUnitPasses()", compUnit.GetPrimaryFile().GetFilename().GetCString());
+
   bool in_cu_list = m_cu_spec_list.FindFileIndex(0, compUnit.GetPrimaryFile(),
                                                  false) != UINT32_MAX;
-  if (!in_cu_list)
+  if (!in_cu_list) {
+    LLDB_LOGF(log, "%50s : Failed", "SearchFilterByModuleListAndCU::CompUnitPasses()");
     return false;
+  }
 
   ModuleSP module_sp(compUnit.GetModule());
-  if (!module_sp)
+  if (!module_sp) {
+    LLDB_LOGF(log, "%50s : Passed", "SearchFilterByModuleListAndCU::CompUnitPasses()");
     return true;
+  }
 
   return SearchFilterByModuleList::ModulePasses(module_sp);
 }

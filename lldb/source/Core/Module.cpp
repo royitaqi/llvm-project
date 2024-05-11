@@ -496,14 +496,18 @@ uint32_t Module::ResolveSymbolContextForAddress(
               return true; // Keep iterating
             });
         sc.symbol = matching_symbol;
+        Log *log = GetLog(LLDBLog::Roy);
+        LLDB_LOGF(log, "%50s : Found matching symbol %s for address %p", "Module::ResolveSymbolContextForAddress()", sc.symbol->GetMangled().GetDemangledName().GetCString(), (void*)so_addr.GetFileAddress());
         if (!sc.symbol && resolve_scope & eSymbolContextFunction &&
             !(resolved_flags & eSymbolContextFunction)) {
           bool verify_unique = false; // No need to check again since
                                       // ResolveSymbolContext failed to find a
                                       // symbol at this address.
-          if (ObjectFile *obj_file = sc.module_sp->GetObjectFile())
+          if (ObjectFile *obj_file = sc.module_sp->GetObjectFile()) {
             sc.symbol =
                 obj_file->ResolveSymbolForAddress(so_addr, verify_unique);
+            LLDB_LOGF(log, "%50s : Override (obj) matching symbol %s for address %p", "Module::ResolveSymbolContextForAddress()", sc.symbol->GetMangled().GetDemangledName().GetCString(), (void*)so_addr.GetFileAddress());
+          }
         }
 
         if (sc.symbol) {
@@ -524,6 +528,7 @@ uint32_t Module::ResolveSymbolContextForAddress(
                           so_addr.GetFileAddress());
                   if (symbol && !symbol->IsSynthetic()) {
                     sc.symbol = symbol;
+                    LLDB_LOGF(log, "%50s : Override (synthetic) matching symbol %s for address %p", "Module::ResolveSymbolContextForAddress()", sc.symbol->GetMangled().GetDemangledName().GetCString(), (void*)so_addr.GetFileAddress());
                   }
                 }
               }
@@ -565,6 +570,8 @@ uint32_t Module::ResolveSymbolContextForAddress(
           } else {
             sc.symbol =
                 nullptr; // Don't trust the symbol if the sections didn't match.
+            Log *log = GetLog(LLDBLog::Roy);
+            LLDB_LOGF(log, "%50s : Override (mismatching section) matching symbol to nullptr", "Module::ResolveSymbolContextForAddress()");
           }
         }
       }

@@ -293,6 +293,10 @@ Searcher::CallbackReturn BreakpointResolverFileLine::SearchCallback(
   const size_t num_comp_units = context.module_sp->GetNumCompileUnits();
   for (size_t i = 0; i < num_comp_units; i++) {
     CompUnitSP cu_sp(context.module_sp->GetCompileUnitAtIndex(i));
+
+    Log *log = GetLog(LLDBLog::Roy);
+    LLDB_LOGF(log, "%50s : Iterating CU %s", "BreakpointResolverFileLine::SearchCallback()", cu_sp->GetPrimaryFile().GetFilename().GetCString());
+
     if (cu_sp) {
       if (filter.CompUnitPasses(*cu_sp))
         cu_sp->ResolveSymbolContext(m_location_spec, eSymbolContextEverything,
