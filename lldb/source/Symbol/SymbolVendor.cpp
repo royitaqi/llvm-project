@@ -13,6 +13,7 @@
 #include "lldb/Symbol/CompileUnit.h"
 #include "lldb/Symbol/ObjectFile.h"
 #include "lldb/Symbol/SymbolFile.h"
+#include "lldb/Utility/LLDBLog.h"
 #include "lldb/Utility/Stream.h"
 
 using namespace lldb;
@@ -65,7 +66,10 @@ void SymbolVendor::AddSymbolFileRepresentation(const ObjectFileSP &objfile_sp) {
   ModuleSP module_sp(GetModule());
   if (module_sp) {
     std::lock_guard<std::recursive_mutex> guard(module_sp->GetMutex());
-    if (objfile_sp)
+    if (objfile_sp) {
+      Log *log = GetLog(LLDBLog::Roy);
+      LLDB_LOGF(log, "%50s : Adding symbol file %s", "SymbolVendor::AddSymbolFileRepresentation()", objfile_sp->GetFileSpec().GetPath().c_str());
       m_sym_file_up.reset(SymbolFile::FindPlugin(objfile_sp));
+    }
   }
 }

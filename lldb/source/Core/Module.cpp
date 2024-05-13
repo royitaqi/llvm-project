@@ -1012,6 +1012,9 @@ SymbolFile *Module::GetSymbolFile(bool can_create, Stream *feedback_strm) {
       }
       ObjectFile *obj_file = GetObjectFile();
       if (obj_file != nullptr) {
+        Log *log = GetLog(LLDBLog::Roy);
+        LLDB_LOGF(log, "%50s : Getting symbol file for %s", "Module::GetSymbolFile()", m_file.GetFilename().GetCString());
+
         LLDB_SCOPED_TIMER();
         m_symfile_up.reset(
             SymbolVendor::FindPlugin(shared_from_this(), feedback_strm));
@@ -1192,6 +1195,10 @@ ObjectFile *Module::GetObjectFile() {
   if (!m_did_load_objfile.load()) {
     std::lock_guard<std::recursive_mutex> guard(m_mutex);
     if (!m_did_load_objfile.load()) {
+
+      Log *log = GetLog(LLDBLog::Roy);
+      LLDB_LOGF(log, "%50s : Getting object file for %s", "Module::GetObjectFile()", m_file.GetFilename().GetCString());
+
       LLDB_SCOPED_TIMERF("Module::GetObjectFile () module = %s",
                          GetFileSpec().GetFilename().AsCString(""));
       lldb::offset_t data_offset = 0;
