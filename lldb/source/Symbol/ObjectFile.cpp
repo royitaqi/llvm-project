@@ -260,6 +260,17 @@ ObjectFile::ObjectFile(const lldb::ModuleSP &module_sp,
             module_sp->GetSpecificationDescription().c_str(),
             m_file ? m_file.GetPath().c_str() : "<NULL>", m_file_offset,
             m_length);
+
+  log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Creating instance from file: module = %p (%s), file = %s, file_offset = 0x%8.8" PRIx64 ", size = %" PRIu64 ", data_sp = %p",
+      "ObjectFile::ObjectFile()",
+      static_cast<void *>(module_sp.get()),
+      module_sp->GetSpecificationDescription().c_str(),
+      m_file ? m_file.GetPath().c_str() : "<NULL>",
+      m_file_offset,
+      m_length,
+      (void*)data_sp.get()
+  );
 }
 
 ObjectFile::ObjectFile(const lldb::ModuleSP &module_sp,
@@ -278,6 +289,16 @@ ObjectFile::ObjectFile(const lldb::ModuleSP &module_sp,
             static_cast<void *>(this), static_cast<void *>(module_sp.get()),
             module_sp->GetSpecificationDescription().c_str(),
             static_cast<void *>(process_sp.get()), m_memory_addr);
+
+  log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Creating instance from process: module = %p (%s), process = %p, header_addr = 0x%" PRIx64 ", header_data_sp = %p",
+      "ObjectFile::ObjectFile()",
+      static_cast<void *>(module_sp.get()),
+      module_sp->GetSpecificationDescription().c_str(),
+      static_cast<void *>(process_sp.get()),
+      m_memory_addr,
+      (void*)header_data_sp.get()
+  );
 }
 
 ObjectFile::~ObjectFile() {
@@ -540,6 +561,8 @@ size_t ObjectFile::ReadSectionData(Section *section,
         DataBufferSP data_sp(
             ReadMemory(process_sp, base_load_addr, section->GetByteSize()));
         if (data_sp) {
+          Log *log = GetLog(LLDBLog::Roy);
+          LLDB_LOGF(log, "%50s : Loading section (from process) %s for %s", "ObjectFile::ReadSectionData()", section->GetName().GetCString(), section->GetModule()->GetFileSpec().GetFilename().AsCString());
           section_data.SetData(data_sp, 0, data_sp->GetByteSize());
           section_data.SetByteOrder(process_sp->GetByteOrder());
           section_data.SetAddressByteSize(process_sp->GetAddressByteSize());
@@ -551,6 +574,8 @@ size_t ObjectFile::ReadSectionData(Section *section,
 
   // The object file now contains a full mmap'ed copy of the object file
   // data, so just use this
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Loading section (from file) %s for %s", "ObjectFile::ReadSectionData()", section->GetName().GetCString(), section->GetModule()->GetFileSpec().GetFilename().AsCString());
   return GetData(section->GetFileOffset(), GetSectionDataSize(section),
                  section_data);
 }

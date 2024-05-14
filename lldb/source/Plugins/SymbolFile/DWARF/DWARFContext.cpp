@@ -8,7 +8,10 @@
 
 #include "DWARFContext.h"
 
+#include "lldb/Core/Module.h"
+#include "lldb/Core/ModuleChild.h"
 #include "lldb/Core/Section.h"
+#include "lldb/Utility/LLDBLog.h"
 #include <optional>
 
 using namespace lldb;
@@ -23,6 +26,9 @@ static DWARFDataExtractor LoadSection(SectionList *section_list,
   auto section_sp = section_list->FindSectionByType(section_type, true);
   if (!section_sp)
     return DWARFDataExtractor();
+
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Loading DWARF section %s for %s", "DWARFContext.cpp/::LoadSection()", section_sp->GetName().GetCString(), section_sp->GetModule()->GetFileSpec().GetFilename().AsCString());
 
   DWARFDataExtractor data;
   section_sp->GetSectionData(data);
