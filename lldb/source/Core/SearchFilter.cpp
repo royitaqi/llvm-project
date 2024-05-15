@@ -9,6 +9,7 @@
 #include "lldb/Core/SearchFilter.h"
 
 #include "lldb/Breakpoint/Breakpoint.h"
+#include "lldb/Core/Debugger.h"
 #include "lldb/Core/Module.h"
 #include "lldb/Core/ModuleList.h"
 #include "lldb/Symbol/CompileUnit.h"
@@ -23,6 +24,7 @@
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/ThreadPool.h"
 
 #include <memory>
 #include <mutex>
@@ -259,6 +261,7 @@ SearchFilter::DoModuleIteration(const SymbolContext &context,
 
   if (context.module_sp) {
     LLDB_LOGF(log, "%50s : Only one module: %s", "SearchFilter::DoModuleIteration()", context.module_sp->GetFileSpec().GetFilename().GetCString());
+
     if (searcher.GetDepth() != lldb::eSearchDepthModule)
       return DoCUIteration(context.module_sp, context, searcher);
 
@@ -267,32 +270,65 @@ SearchFilter::DoModuleIteration(const SymbolContext &context,
     return Searcher::eCallbackReturnContinue;
   }
 
+
+  // for (ModuleSP module_sp : m_target_sp->GetImages().Modules()) {
+  //   Log *log = GetLog(LLDBLog::Roy);
+  //   LLDB_LOGF(log, "%50s : Iterating module %s", "SearchFilter::DoModuleIteration()", module_sp->GetFileSpec().GetFilename().GetCString());
+
+  //   // If this is the last level supplied, then call the callback directly,
+  //   // otherwise descend.
+  //   if (!ModulePasses(module_sp))
+  //     continue;
+
+  //   if (searcher.GetDepth() == lldb::eSearchDepthModule) {
+  //     SymbolContext matchingContext(m_target_sp, module_sp);
+
+  //     Searcher::CallbackReturn shouldContinue =
+  //         searcher.SearchCallback(*this, matchingContext, nullptr);
+  //     if (shouldContinue == Searcher::eCallbackReturnStop ||
+  //         shouldContinue == Searcher::eCallbackReturnPop)
+  //       return shouldContinue;
+  //   } else {
+  //     Searcher::CallbackReturn shouldContinue =
+  //         DoCUIteration(module_sp, context, searcher);
+  //     if (shouldContinue == Searcher::eCallbackReturnStop)
+  //       return shouldContinue;
+  //     else if (shouldContinue == Searcher::eCallbackReturnPop)
+  //       continue;
+  //   }
+  // }
+
+  LLDB_LOGF(log, "%50s : A", "SearchFilter::DoModuleIteration()");
+  std::vector<lldb::ModuleSP> modules;
+  // std::copy(m_target_sp->GetImages().Modules().begin(), m_target_sp->GetImages().Modules().end(), modules.begin());
   for (ModuleSP module_sp : m_target_sp->GetImages().Modules()) {
-    Log *log = GetLog(LLDBLog::Roy);
+    modules.push_back(module_sp);
+  }
+  LLDB_LOGF(log, "%50s : B", "SearchFilter::DoModuleIteration()");
+
+  auto iterate_fn = [&](size_t i) {
+    auto module_sp = modules[i];
+
     LLDB_LOGF(log, "%50s : Iterating module %s", "SearchFilter::DoModuleIteration()", module_sp->GetFileSpec().GetFilename().GetCString());
 
     // If this is the last level supplied, then call the callback directly,
     // otherwise descend.
     if (!ModulePasses(module_sp))
-      continue;
+      return;
 
     if (searcher.GetDepth() == lldb::eSearchDepthModule) {
       SymbolContext matchingContext(m_target_sp, module_sp);
 
-      Searcher::CallbackReturn shouldContinue =
-          searcher.SearchCallback(*this, matchingContext, nullptr);
-      if (shouldContinue == Searcher::eCallbackReturnStop ||
-          shouldContinue == Searcher::eCallbackReturnPop)
-        return shouldContinue;
+      searcher.SearchCallback(*this, matchingContext, nullptr);
     } else {
-      Searcher::CallbackReturn shouldContinue =
-          DoCUIteration(module_sp, context, searcher);
-      if (shouldContinue == Searcher::eCallbackReturnStop)
-        return shouldContinue;
-      else if (shouldContinue == Searcher::eCallbackReturnPop)
-        continue;
+      DoCUIteration(module_sp, context, searcher);
     }
-  }
+  };
+
+  llvm::ThreadPoolTaskGroup task_group(Debugger::GetThreadPool());
+  for (size_t i = 0; i < modules.size(); ++i)
+    task_group.async(iterate_fn, i);
+  task_group.wait();
 
   return Searcher::eCallbackReturnContinue;
 }
