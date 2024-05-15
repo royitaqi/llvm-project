@@ -255,7 +255,10 @@ SearchFilter::DoModuleIteration(const SymbolContext &context,
   if (searcher.GetDepth() < lldb::eSearchDepthModule)
     return Searcher::eCallbackReturnContinue;
 
+  Log *log = GetLog(LLDBLog::Roy);
+
   if (context.module_sp) {
+    LLDB_LOGF(log, "%50s : Only one module: %s", "SearchFilter::DoModuleIteration()", context.module_sp->GetFileSpec().GetFilename().GetCString());
     if (searcher.GetDepth() != lldb::eSearchDepthModule)
       return DoCUIteration(context.module_sp, context, searcher);
 
