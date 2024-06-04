@@ -766,6 +766,9 @@ void Debugger::Destroy(DebuggerSP &debugger_sp) {
   if (!debugger_sp)
     return;
 
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : calling destory callback", "Debugger::Destroy()");
+
   debugger_sp->HandleDestroyCallback();
   CommandInterpreter &cmd_interpreter = debugger_sp->GetCommandInterpreter();
 
@@ -777,6 +780,8 @@ void Debugger::Destroy(DebuggerSP &debugger_sp) {
     else
       (*debugger_sp->GetAsyncErrorStream()) << result.GetErrorData() << '\n';
   }
+
+  LLDB_LOGF(log, "%50s : clearing debugger", "Debugger::Destroy()");
 
   debugger_sp->Clear();
 

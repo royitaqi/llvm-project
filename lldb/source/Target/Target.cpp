@@ -178,6 +178,9 @@ void Target::CleanupProcess() {
   // Do any cleanup of the target we need to do between process instances.
   // NB It is better to do this before destroying the process in case the
   // clean up needs some help from the process.
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : Cleaning up process", "Target::CleanupProcess()");
+
   m_breakpoint_list.ClearAllBreakpointSites();
   m_internal_breakpoint_list.ClearAllBreakpointSites();
   ResetBreakpointHitCounts();
@@ -277,6 +280,9 @@ void Target::SetREPL(lldb::LanguageType language, lldb::REPLSP repl_sp) {
 }
 
 void Target::Destroy() {
+  Log *log = GetLog(LLDBLog::Roy);
+  LLDB_LOGF(log, "%50s : destroying target", "Target::Destroy()");
+
   std::lock_guard<std::recursive_mutex> guard(m_mutex);
   m_valid = false;
   DeleteCurrentProcess();
