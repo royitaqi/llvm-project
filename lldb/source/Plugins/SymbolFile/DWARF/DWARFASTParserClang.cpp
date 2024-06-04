@@ -2232,6 +2232,10 @@ bool DWARFASTParserClang::CompleteRecordType(const DWARFDIE &die,
       // For objective C we don't start the definition when the class is
       // created.
       TypeSystemClang::StartTagDeclarationDefinition(clang_type);
+    } else {
+      assert(clang_type.IsBeingDefined() &&
+             "Trying to complete a definition without a prior call to "
+             "StartTagDeclarationDefinition.");
     }
 
     AccessType default_accessibility = eAccessNone;
@@ -2344,11 +2348,6 @@ bool DWARFASTParserClang::CompleteTypeFromDWARF(const DWARFDIE &die,
   m_ast.SetHasExternalStorage(clang_type.GetOpaqueQualType(), false);
 
   if (!die)
-    return false;
-  ParsedDWARFTypeAttributes attrs(die);
-  bool is_forward_declaration = IsForwardDeclaration(
-      die, attrs, SymbolFileDWARF::GetLanguage(*die.GetCU()));
-  if (is_forward_declaration)
     return false;
 
   const dw_tag_t tag = die.Tag();

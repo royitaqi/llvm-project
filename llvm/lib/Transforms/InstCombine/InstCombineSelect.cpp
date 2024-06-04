@@ -1127,7 +1127,7 @@ static Instruction *foldSelectCtlzToCttz(ICmpInst *ICI, Value *TrueVal,
 /// into:
 ///   %0 = tail call i32 @llvm.cttz.i32(i32 %x, i1 false)
 static Value *foldSelectCttzCtlz(ICmpInst *ICI, Value *TrueVal, Value *FalseVal,
-                                 InstCombiner::BuilderTy &Builder) {
+                                 InstCombinerImpl &IC) {
   ICmpInst::Predicate Pred = ICI->getPredicate();
   Value *CmpLHS = ICI->getOperand(0);
   Value *CmpRHS = ICI->getOperand(1);
@@ -1169,6 +1169,9 @@ static Value *foldSelectCttzCtlz(ICmpInst *ICI, Value *TrueVal, Value *FalseVal,
     // Explicitly clear the 'is_zero_poison' flag. It's always valid to go from
     // true to false on this flag, so we can replace it for all users.
     II->setArgOperand(1, ConstantInt::getFalse(II->getContext()));
+    // A range annotation on the intrinsic may no longer be valid.
+    II->dropPoisonGeneratingAnnotations();
+    IC.addToWorklist(II);
     return SelectArg;
   }
 
@@ -1921,7 +1924,7 @@ Instruction *InstCombinerImpl::foldSelectInstWithICmp(SelectInst &SI,
   if (Value *V = foldSelectICmpLshrAshr(ICI, TrueVal, FalseVal, Builder))
     return replaceInstUsesWith(SI, V);
 
-  if (Value *V = foldSelectCttzCtlz(ICI, TrueVal, FalseVal, Builder))
+  if (Value *V = foldSelectCttzCtlz(ICI, TrueVal, FalseVal, *this))
     return replaceInstUsesWith(SI, V);
 
   if (Value *V = canonicalizeSaturatedSubtract(ICI, TrueVal, FalseVal, Builder))
@@ -3343,7 +3346,8 @@ Instruction *InstCombinerImpl::foldSelectOfBools(SelectInst &SI) {
 // pattern.
 static bool isSafeToRemoveBitCeilSelect(ICmpInst::Predicate Pred, Value *Cond0,
                                         const APInt *Cond1, Value *CtlzOp,
-                                        unsigned BitWidth) {
+                                        unsigned BitWidth,
+                                        bool &ShouldDropNUW) {
   // The challenge in recognizing std::bit_ceil(X) is that the operand is used
   // for the CTLZ proper and select condition, each possibly with some
   // operation like add and sub.
@@ -3366,6 +3370,8 @@ static bool isSafeToRemoveBitCeilSelect(ICmpInst::Predicate Pred, Value *Cond0,
   ConstantRange CR = ConstantRange::makeExactICmpRegion(
       CmpInst::getInversePredicate(Pred), *Cond1);
 
+  ShouldDropNUW = false;
+
   // Match the operation that's used to compute CtlzOp from CommonAncestor.  If
   // CtlzOp == CommonAncestor, return true as no operation is needed.  If a
   // match is found, execute the operation on CR, update CR, and return true.
@@ -3379,6 +3385,7 @@ static bool isSafeToRemoveBitCeilSelect(ICmpInst::Predicate Pred, Value *Cond0,
       return true;
     }
     if (match(CtlzOp, m_Sub(m_APInt(C), m_Specific(CommonAncestor)))) {
+      ShouldDropNUW = true;
       CR = ConstantRange(*C).sub(CR);
       return true;
     }
@@ -3448,13 +3455,19 @@ static Instruction *foldBitCeil(SelectInst &SI, IRBuilderBase &Builder) {
     Pred = CmpInst::getInversePredicate(Pred);
   }
 
+  bool ShouldDropNUW;
+
   if (!match(FalseVal, m_One()) ||
       !match(TrueVal,
              m_OneUse(m_Shl(m_One(), m_OneUse(m_Sub(m_SpecificInt(BitWidth),
                                                     m_Value(Ctlz)))))) ||
       !match(Ctlz, m_Intrinsic<Intrinsic::ctlz>(m_Value(CtlzOp), m_Zero())) ||
-      !isSafeToRemoveBitCeilSelect(Pred, Cond0, Cond1, CtlzOp, BitWidth))
+      !isSafeToRemoveBitCeilSelect(Pred, Cond0, Cond1, CtlzOp, BitWidth,
+                                   ShouldDropNUW))
     return nullptr;
+
+  if (ShouldDropNUW)
+    cast<Instruction>(CtlzOp)->setHasNoUnsignedWrap(false);
 
   // Build 1 << (-CTLZ & (BitWidth-1)).  The negation likely corresponds to a
   // single hardware instruction as opposed to BitWidth - CTLZ, where BitWidth
@@ -3490,6 +3503,33 @@ static bool matchFMulByZeroIfResultEqZero(InstCombinerImpl &IC, Value *Cmp0,
   }
 
   return false;
+}
+
+/// Return true iff:
+/// 1. X is poison implies Y is poison.
+/// 2. X is true implies Y is false.
+/// 3. X is false implies Y is true.
+/// Otherwise, return false.
+static bool isKnownInversion(Value *X, Value *Y) {
+  // Handle X = icmp pred A, B, Y = icmp pred A, C.
+  Value *A, *B, *C;
+  ICmpInst::Predicate Pred1, Pred2;
+  if (!match(X, m_ICmp(Pred1, m_Value(A), m_Value(B))) ||
+      !match(Y, m_c_ICmp(Pred2, m_Specific(A), m_Value(C))))
+    return false;
+
+  if (B == C)
+    return Pred1 == ICmpInst::getInversePredicate(Pred2);
+
+  // Try to infer the relationship from constant ranges.
+  const APInt *RHSC1, *RHSC2;
+  if (!match(B, m_APInt(RHSC1)) || !match(C, m_APInt(RHSC2)))
+    return false;
+
+  const auto CR1 = ConstantRange::makeExactICmpRegion(Pred1, *RHSC1);
+  const auto CR2 = ConstantRange::makeExactICmpRegion(Pred2, *RHSC2);
+
+  return CR1.inverse() == CR2;
 }
 
 Instruction *InstCombinerImpl::visitSelectInst(SelectInst &SI) {
@@ -3985,6 +4025,10 @@ Instruction *InstCombinerImpl::visitSelectInst(SelectInst &SI) {
         return I;
     }
   }
+
+  // select Cond, !X, X -> xor Cond, X
+  if (CondVal->getType() == SI.getType() && isKnownInversion(FalseVal, TrueVal))
+    return BinaryOperator::CreateXor(CondVal, FalseVal);
 
   return nullptr;
 }
