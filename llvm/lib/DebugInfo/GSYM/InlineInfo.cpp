@@ -68,17 +68,18 @@ InlineInfo::getInlineStack(uint64_t Addr) const {
 ///
 /// \param SkippedRanges If true, address ranges have already been skipped.
 
-static bool skip(DataExtractor &Data, uint64_t &Offset, bool SkippedRanges) {
+static bool skip(DataExtractor &Data, uint64_t &Offset, bool SkippedRanges,
+                 uint8_t StringOffsetSize) {
   if (!SkippedRanges) {
     if (skipRanges(Data, Offset) == 0)
       return false;
   }
   bool HasChildren = Data.getU8(&Offset) != 0;
-  Data.getU32(&Offset); // Skip Inline.Name.
+  Data.getUnsigned(&Offset, StringOffsetSize); // Skip Inline.Name.
   Data.getULEB128(&Offset); // Skip Inline.CallFile.
   Data.getULEB128(&Offset); // Skip Inline.CallLine.
   if (HasChildren) {
-    while (skip(Data, Offset, false /* SkippedRanges */))
+    while (skip(Data, Offset, false /* SkippedRanges */, StringOffsetSize))
       /* Do nothing */;
   }
   // We skipped a valid InlineInfo.
@@ -102,7 +103,7 @@ static bool skip(DataExtractor &Data, uint64_t &Offset, bool SkippedRanges) {
 
 static bool lookup(const GsymReader &GR, DataExtractor &Data, uint64_t &Offset,
                    uint64_t BaseAddr, uint64_t Addr, SourceLocations &SrcLocs,
-                   llvm::Error &Err) {
+                   llvm::Error &Err, uint8_t StringOffsetSize) {
   InlineInfo Inline;
   decodeRanges(Inline.Ranges, Data, BaseAddr, Offset);
   if (Inline.Ranges.empty())
@@ -110,14 +111,14 @@ static bool lookup(const GsymReader &GR, DataExtractor &Data, uint64_t &Offset,
   // Check if the address is contained within the inline information, and if
   // not, quickly skip this InlineInfo object and all its children.
   if (!Inline.Ranges.contains(Addr)) {
-    skip(Data, Offset, true /* SkippedRanges */);
+    skip(Data, Offset, true /* SkippedRanges */, StringOffsetSize);
     return false;
   }
 
   // The address range is contained within this InlineInfo, add the source
   // location for this InlineInfo and any children that contain the address.
   bool HasChildren = Data.getU8(&Offset) != 0;
-  Inline.Name = Data.getU32(&Offset);
+  Inline.Name = Data.getUnsigned(&Offset, StringOffsetSize);
   Inline.CallFile = (uint32_t)Data.getULEB128(&Offset);
   Inline.CallLine = (uint32_t)Data.getULEB128(&Offset);
   if (HasChildren) {
@@ -126,7 +127,8 @@ static bool lookup(const GsymReader &GR, DataExtractor &Data, uint64_t &Offset,
     const auto ChildBaseAddr = Inline.Ranges[0].start();
     bool Done = false;
     while (!Done)
-      Done = lookup(GR, Data, Offset, ChildBaseAddr, Addr, SrcLocs, Err);
+      Done = lookup(GR, Data, Offset, ChildBaseAddr, Addr, SrcLocs, Err,
+                    StringOffsetSize);
   }
 
   std::optional<FileEntry> CallFile = GR.getFile(Inline.CallFile);
@@ -153,11 +155,12 @@ static bool lookup(const GsymReader &GR, DataExtractor &Data, uint64_t &Offset,
 
 llvm::Error InlineInfo::lookup(const GsymReader &GR, DataExtractor &Data,
                                uint64_t BaseAddr, uint64_t Addr,
-                               SourceLocations &SrcLocs) {
+                               SourceLocations &SrcLocs,
+                               uint8_t StringOffsetSize) {
   // Call our recursive helper function starting at offset zero.
   uint64_t Offset = 0;
   llvm::Error Err = Error::success();
-  ::lookup(GR, Data, Offset, BaseAddr, Addr, SrcLocs, Err);
+  ::lookup(GR, Data, Offset, BaseAddr, Addr, SrcLocs, Err, StringOffsetSize);
   return Err;
 }
 
@@ -172,7 +175,8 @@ llvm::Error InlineInfo::lookup(const GsymReader &GR, DataExtractor &Data,
 /// \returns An InlineInfo or an error describing the issue that was
 /// encountered during decoding.
 static llvm::Expected<InlineInfo> decode(DataExtractor &Data, uint64_t &Offset,
-                                         uint64_t BaseAddr) {
+                                         uint64_t BaseAddr,
+                                         uint8_t StringOffsetSize) {
   InlineInfo Inline;
   if (!Data.isValidOffset(Offset))
     return createStringError(std::errc::io_error,
@@ -185,10 +189,10 @@ static llvm::Expected<InlineInfo> decode(DataExtractor &Data, uint64_t &Offset,
         "0x%8.8" PRIx64 ": missing InlineInfo uint8_t indicating children",
         Offset);
   bool HasChildren = Data.getU8(&Offset) != 0;
-  if (!Data.isValidOffsetForDataOfSize(Offset, 4))
+  if (!Data.isValidOffsetForDataOfSize(Offset, StringOffsetSize))
     return createStringError(std::errc::io_error,
-        "0x%8.8" PRIx64 ": missing InlineInfo uint32_t for name", Offset);
-  Inline.Name = Data.getU32(&Offset);
+        "0x%8.8" PRIx64 ": missing InlineInfo name", Offset);
+  Inline.Name = Data.getUnsigned(&Offset, StringOffsetSize);
   if (!Data.isValidOffset(Offset))
     return createStringError(std::errc::io_error,
         "0x%8.8" PRIx64 ": missing ULEB128 for InlineInfo call file", Offset);
@@ -202,7 +206,8 @@ static llvm::Expected<InlineInfo> decode(DataExtractor &Data, uint64_t &Offset,
     // parent InlineInfo object.
     const auto ChildBaseAddr = Inline.Ranges[0].start();
     while (true) {
-      llvm::Expected<InlineInfo> Child = decode(Data, Offset, ChildBaseAddr);
+      llvm::Expected<InlineInfo> Child =
+          decode(Data, Offset, ChildBaseAddr, StringOffsetSize);
       if (!Child)
         return Child.takeError();
       // InlineInfo with empty Ranges termintes a child sibling chain.
@@ -215,12 +220,14 @@ static llvm::Expected<InlineInfo> decode(DataExtractor &Data, uint64_t &Offset,
 }
 
 llvm::Expected<InlineInfo> InlineInfo::decode(DataExtractor &Data,
-                                              uint64_t BaseAddr) {
+                                              uint64_t BaseAddr,
+                                              uint8_t StringOffsetSize) {
   uint64_t Offset = 0;
-  return ::decode(Data, Offset, BaseAddr);
+  return ::decode(Data, Offset, BaseAddr, StringOffsetSize);
 }
 
-llvm::Error InlineInfo::encode(FileWriter &O, uint64_t BaseAddr) const {
+llvm::Error InlineInfo::encode(FileWriter &O, uint64_t BaseAddr,
+                               uint8_t StringOffsetSize) const {
   // Users must verify the InlineInfo is valid prior to calling this funtion.
   // We don't want to emit any InlineInfo objects if they are not valid since
   // it will waste space in the GSYM file.
@@ -230,7 +237,7 @@ llvm::Error InlineInfo::encode(FileWriter &O, uint64_t BaseAddr) const {
   encodeRanges(Ranges, O, BaseAddr);
   bool HasChildren = !Children.empty();
   O.writeU8(HasChildren);
-  O.writeU32(Name);
+  O.writeUnsigned(Name, StringOffsetSize);
   O.writeULEB(CallFile);
   O.writeULEB(CallLine);
   if (HasChildren) {
@@ -246,7 +253,7 @@ llvm::Error InlineInfo::encode(FileWriter &O, uint64_t BaseAddr) const {
           return createStringError(std::errc::invalid_argument,
                                    "child range not contained in parent");
       }
-      llvm::Error Err = Child.encode(O, ChildBaseAddr);
+      llvm::Error Err = Child.encode(O, ChildBaseAddr, StringOffsetSize);
       if (Err)
         return Err;
     }

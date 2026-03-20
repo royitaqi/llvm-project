@@ -523,7 +523,7 @@ TEST(GSYMTest, TestInlineInfoDecodeErrors) {
       "0x00000004: missing InlineInfo uint8_t indicating children");
   FW.writeU8(0);
   TestInlineInfoDecodeError(ByteOrder, OutStrm.str(), BaseAddr,
-      "0x00000005: missing InlineInfo uint32_t for name");
+      "0x00000005: missing InlineInfo name");
   FW.writeU32(0);
   TestInlineInfoDecodeError(ByteOrder, OutStrm.str(), BaseAddr,
       "0x00000009: missing ULEB128 for InlineInfo call file");
@@ -870,6 +870,8 @@ static void InitHeader(Header &H) {
   H.UUIDSize = 16;
   H.BaseAddress = 0x1000;
   H.NumAddresses = 1;
+  H.FuncInfoOffsetSize = 4;
+  H.StringOffsetSize = 4;
   H.StrtabOffset= 0x2000;
   H.StrtabSize = 0x1000;
   for (size_t i=0; i<GSYM_MAX_UUID_SIZE; ++i) {
@@ -4891,13 +4893,13 @@ TEST(GSYMTest, TestLookupsOfOverlappingAndUnequalRanges) {
 
   // Make sure we see both "foo" and "bar" in the output of an entire GSYM
   // dump. Prior to this fix we would two "foo" entries.
-  std::vector<std::string> ExpectedDumpLines = {
-      "@ 0x00000068: [0x0000000000001000 - 0x0000000000001050) \"foo\"",
-      "@ 0x00000088: [0x0000000000001000 - 0x0000000000001100) \"bar\""};
-  // Make sure all expected errors are in the error stream for the two invalid
-  // inlined functions that we removed due to invalid range scoping.
-  for (const auto &Line : ExpectedDumpLines)
-    EXPECT_TRUE(DumpStr.find(Line) != std::string::npos);
+  // Dump output uses "@ <offset>:" prefix. The offsets depend on the header
+  // and table sizes which differ between V1 and V2. Just check that both
+  // function entries appear with correct ranges and names.
+  EXPECT_TRUE(DumpStr.find("[0x0000000000001000 - 0x0000000000001050) \"foo\"")
+              != std::string::npos);
+  EXPECT_TRUE(DumpStr.find("[0x0000000000001000 - 0x0000000000001100) \"bar\"")
+              != std::string::npos);
 }
 
 TEST(GSYMTest, TestUnableToLocateDWO) {

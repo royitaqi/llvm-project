@@ -23,7 +23,7 @@ struct StringTable {
   StringTable() = default;
   StringTable(StringRef D) : Data(D) {}
   StringRef operator[](size_t Offset) const { return getString(Offset); }
-  StringRef getString(uint32_t Offset) const {
+  StringRef getString(uint64_t Offset) const {
     if (Offset < Data.size()) {
       auto End = Data.find('\0', Offset);
       return Data.substr(Offset, End - Offset);

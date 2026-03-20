@@ -55,15 +55,17 @@ struct MergedFunctionsInfo {
   /// \returns An MergedFunctionsInfo or an error describing the issue that was
   /// encountered during decoding.
   LLVM_ABI static llvm::Expected<MergedFunctionsInfo>
-  decode(DataExtractor &Data, uint64_t BaseAddr);
+  decode(DataExtractor &Data, uint64_t BaseAddr, uint8_t StringOffsetSize = 4);
 
   /// Encode this MergedFunctionsInfo object into FileWriter stream.
   ///
   /// \param O The binary stream to write the data to at the current file
   /// position.
+  /// \param StringOffsetSize The byte size for string table offsets.
   /// \returns An error object that indicates success or failure for the
   /// encoding process.
-  LLVM_ABI llvm::Error encode(FileWriter &O) const;
+  LLVM_ABI llvm::Error encode(FileWriter &O,
+                              uint8_t StringOffsetSize = 4) const;
 };
 
 LLVM_ABI bool operator==(const MergedFunctionsInfo &LHS,

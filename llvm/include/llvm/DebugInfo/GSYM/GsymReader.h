@@ -50,9 +50,10 @@ class GsymReader {
   StringRef GsymBytes;
   llvm::endianness Endian;
   const Header *Hdr = nullptr;
+  Header OwnedHdr; ///< Storage for decoded header (always used).
   ArrayRef<uint8_t> AddrOffsets;
-  ArrayRef<uint32_t> AddrInfoOffsets;
-  ArrayRef<FileEntry> Files;
+  std::vector<uint64_t> AddrInfoOffsets;
+  std::vector<FileEntry> DecodedFiles;
   StringTable StrTab;
   /// When the GSYM file's endianness doesn't match the host system then
   /// we must decode all data structures that need to be swapped into
@@ -61,13 +62,11 @@ class GsymReader {
   struct SwappedData {
     Header Hdr;
     std::vector<uint8_t> AddrOffsets;
-    std::vector<uint32_t> AddrInfoOffsets;
-    std::vector<FileEntry> Files;
   };
   std::unique_ptr<SwappedData> Swap;
 
 public:
-  LLVM_ABI GsymReader(GsymReader &&RHS);
+  LLVM_ABI GsymReader(GsymReader &&RHS) noexcept;
   LLVM_ABI ~GsymReader();
 
   /// Construct a GsymReader from a file on disk.
@@ -158,7 +157,7 @@ public:
   ///
   /// \param Offset The string table offset for the string to retrieve.
   /// \returns The string from the strin table.
-  StringRef getString(uint32_t Offset) const { return StrTab[Offset]; }
+  StringRef getString(uint64_t Offset) const { return StrTab[Offset]; }
 
   /// Get the a file entry for the suppplied file index.
   ///
@@ -170,8 +169,8 @@ public:
   /// \returns An optional FileInfo that will be valid if the file index is
   /// valid, or std::nullopt if the file index is out of bounds,
   std::optional<FileEntry> getFile(uint32_t Index) const {
-    if (Index < Files.size())
-      return Files[Index];
+    if (Index < DecodedFiles.size())
+      return DecodedFiles[Index];
     return std::nullopt;
   }
 

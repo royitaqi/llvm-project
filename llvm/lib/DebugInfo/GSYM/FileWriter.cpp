@@ -49,10 +49,39 @@ void FileWriter::writeU64(uint64_t U) {
   OS.write(reinterpret_cast<const char *>(&Swapped), sizeof(Swapped));
 }
 
+void FileWriter::writeUnsigned(uint64_t U, uint8_t ByteSize) {
+  const uint64_t Swapped = support::endian::byte_swap(U, ByteOrder);
+  // For little-endian, the low bytes come first, so we write from the start.
+  // For big-endian after swapping, the low bytes are at the end, so we write
+  // from offset (8 - ByteSize).
+  const char *Ptr = reinterpret_cast<const char *>(&Swapped);
+  if (ByteOrder == llvm::endianness::big ||
+      (ByteOrder == llvm::endianness::native &&
+       llvm::endianness::native == llvm::endianness::big))
+    Ptr += 8 - ByteSize;
+  OS.write(Ptr, ByteSize);
+}
+
 void FileWriter::fixup32(uint32_t U, uint64_t Offset) {
   const uint32_t Swapped = support::endian::byte_swap(U, ByteOrder);
   OS.pwrite(reinterpret_cast<const char *>(&Swapped), sizeof(Swapped),
             Offset);
+}
+
+void FileWriter::fixup64(uint64_t U, uint64_t Offset) {
+  const uint64_t Swapped = support::endian::byte_swap(U, ByteOrder);
+  OS.pwrite(reinterpret_cast<const char *>(&Swapped), sizeof(Swapped),
+            Offset);
+}
+
+void FileWriter::fixupUnsigned(uint64_t U, uint64_t Offset, uint8_t ByteSize) {
+  const uint64_t Swapped = support::endian::byte_swap(U, ByteOrder);
+  const char *Ptr = reinterpret_cast<const char *>(&Swapped);
+  if (ByteOrder == llvm::endianness::big ||
+      (ByteOrder == llvm::endianness::native &&
+       llvm::endianness::native == llvm::endianness::big))
+    Ptr += 8 - ByteSize;
+  OS.pwrite(Ptr, ByteSize, Offset);
 }
 
 void FileWriter::writeData(llvm::ArrayRef<uint8_t> Data) {

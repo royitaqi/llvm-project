@@ -16,14 +16,16 @@ using namespace gsym;
 
 void MergedFunctionsInfo::clear() { MergedFunctions.clear(); }
 
-llvm::Error MergedFunctionsInfo::encode(FileWriter &Out) const {
+llvm::Error MergedFunctionsInfo::encode(FileWriter &Out,
+                                        uint8_t StringOffsetSize) const {
   Out.writeU32(MergedFunctions.size());
   for (const auto &F : MergedFunctions) {
     Out.writeU32(0);
     const auto StartOffset = Out.tell();
     // Encode the FunctionInfo with no padding so later we can just read them
     // one after the other without knowing the offset in the stream for each.
-    llvm::Expected<uint64_t> result = F.encode(Out, /*NoPadding =*/true);
+    llvm::Expected<uint64_t> result =
+        F.encode(Out, /*NoPadding =*/true, StringOffsetSize);
     if (!result)
       return result.takeError();
     const auto Length = Out.tell() - StartOffset;
@@ -33,7 +35,8 @@ llvm::Error MergedFunctionsInfo::encode(FileWriter &Out) const {
 }
 
 llvm::Expected<MergedFunctionsInfo>
-MergedFunctionsInfo::decode(DataExtractor &Data, uint64_t BaseAddr) {
+MergedFunctionsInfo::decode(DataExtractor &Data, uint64_t BaseAddr,
+                            uint8_t StringOffsetSize) {
   MergedFunctionsInfo MFI;
   auto FuncExtractorsOrError = MFI.getFuncsDataExtractors(Data);
 
@@ -41,7 +44,8 @@ MergedFunctionsInfo::decode(DataExtractor &Data, uint64_t BaseAddr) {
     return FuncExtractorsOrError.takeError();
 
   for (DataExtractor &FuncData : *FuncExtractorsOrError) {
-    llvm::Expected<FunctionInfo> FI = FunctionInfo::decode(FuncData, BaseAddr);
+    llvm::Expected<FunctionInfo> FI =
+        FunctionInfo::decode(FuncData, BaseAddr, StringOffsetSize);
     if (!FI)
       return FI.takeError();
     MFI.MergedFunctions.push_back(std::move(*FI));

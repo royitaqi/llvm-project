@@ -59,7 +59,7 @@ class GsymReader;
 ///
 struct InlineInfo {
 
-  uint32_t Name = 0;     ///< String table offset in the string table.
+  uint64_t Name = 0;     ///< String table offset in the string table.
   uint32_t CallFile = 0; ///< 1 based file index in the file table.
   uint32_t CallLine = 0; ///< Source line number.
   AddressRanges Ranges;
@@ -120,7 +120,8 @@ struct InlineInfo {
   ///          is added to \a SrcLocs.
   LLVM_ABI static llvm::Error lookup(const GsymReader &GR, DataExtractor &Data,
                                      uint64_t BaseAddr, uint64_t Addr,
-                                     SourceLocations &SrcLocs);
+                                     SourceLocations &SrcLocs,
+                                     uint8_t StringOffsetSize = 4);
 
   /// Lookup an address in the InlineInfo object
   ///
@@ -148,8 +149,8 @@ struct InlineInfo {
   /// another InlineInfo object.
   /// \returns An InlineInfo or an error describing the issue that was
   /// encountered during decoding.
-  LLVM_ABI static llvm::Expected<InlineInfo> decode(DataExtractor &Data,
-                                                    uint64_t BaseAddr);
+  LLVM_ABI static llvm::Expected<InlineInfo>
+  decode(DataExtractor &Data, uint64_t BaseAddr, uint8_t StringOffsetSize = 4);
 
   /// Encode this InlineInfo object into FileWriter stream.
   ///
@@ -164,7 +165,8 @@ struct InlineInfo {
   ///
   /// \returns An error object that indicates success or failure or the
   /// encoding process.
-  LLVM_ABI llvm::Error encode(FileWriter &O, uint64_t BaseAddr) const;
+  LLVM_ABI llvm::Error encode(FileWriter &O, uint64_t BaseAddr,
+                              uint8_t StringOffsetSize = 4) const;
 
   /// Compare InlineInfo objects.
   ///

@@ -89,6 +89,14 @@ public:
   /// \param   Str The value to write into the stream.
   LLVM_ABI void writeNullTerminated(llvm::StringRef Str);
 
+  /// Write an unsigned integer of the specified byte size (1-8) into the
+  /// stream at the current file position. The value will be byte swapped if
+  /// needed to match the byte order specified during construction.
+  ///
+  /// \param   Value The value to write into the stream.
+  /// \param   ByteSize The number of bytes to write (1-8).
+  LLVM_ABI void writeUnsigned(uint64_t Value, uint8_t ByteSize);
+
   /// Fixup a uint32_t value at the specified offset in the stream. This
   /// function will save the current file position, seek to the specified
   /// offset, overwrite the data using Value, and then restore the file
@@ -97,6 +105,21 @@ public:
   /// \param   Value The value to write into the stream.
   /// \param   Offset The offset at which to write the Value within the stream.
   LLVM_ABI void fixup32(uint32_t Value, uint64_t Offset);
+
+  /// Fixup a uint64_t value at the specified offset in the stream.
+  ///
+  /// \param   Value The value to write into the stream.
+  /// \param   Offset The offset at which to write the Value within the stream.
+  LLVM_ABI void fixup64(uint64_t Value, uint64_t Offset);
+
+  /// Fixup an unsigned integer of the specified byte size (1-8) at the
+  /// specified offset in the stream.
+  ///
+  /// \param   Value The value to write into the stream.
+  /// \param   Offset The offset at which to write the Value within the stream.
+  /// \param   ByteSize The number of bytes to write (1-8).
+  LLVM_ABI void fixupUnsigned(uint64_t Value, uint64_t Offset,
+                               uint8_t ByteSize);
 
   /// Pad with zeroes at the current file position until the current file
   /// position matches the specified alignment.

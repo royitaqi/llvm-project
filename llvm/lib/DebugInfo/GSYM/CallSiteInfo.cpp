@@ -22,17 +22,18 @@
 using namespace llvm;
 using namespace gsym;
 
-Error CallSiteInfo::encode(FileWriter &O) const {
+Error CallSiteInfo::encode(FileWriter &O, uint8_t StringOffsetSize) const {
   O.writeU64(ReturnOffset);
   O.writeU8(Flags);
   O.writeU32(MatchRegex.size());
-  for (uint32_t Entry : MatchRegex)
-    O.writeU32(Entry);
+  for (uint64_t Entry : MatchRegex)
+    O.writeUnsigned(Entry, StringOffsetSize);
   return Error::success();
 }
 
 Expected<CallSiteInfo> CallSiteInfo::decode(DataExtractor &Data,
-                                            uint64_t &Offset) {
+                                            uint64_t &Offset,
+                                            uint8_t StringOffsetSize) {
   CallSiteInfo CSI;
 
   // Read ReturnOffset
@@ -56,28 +57,30 @@ Expected<CallSiteInfo> CallSiteInfo::decode(DataExtractor &Data,
 
   CSI.MatchRegex.reserve(NumEntries);
   for (uint32_t i = 0; i < NumEntries; ++i) {
-    if (!Data.isValidOffsetForDataOfSize(Offset, sizeof(uint32_t)))
+    if (!Data.isValidOffsetForDataOfSize(Offset, StringOffsetSize))
       return createStringError(std::errc::io_error,
                                "0x%8.8" PRIx64 ": missing MatchRegex entry",
                                Offset);
-    uint32_t Entry = Data.getU32(&Offset);
+    uint64_t Entry = Data.getUnsigned(&Offset, StringOffsetSize);
     CSI.MatchRegex.push_back(Entry);
   }
 
   return CSI;
 }
 
-Error CallSiteInfoCollection::encode(FileWriter &O) const {
+Error CallSiteInfoCollection::encode(FileWriter &O,
+                                     uint8_t StringOffsetSize) const {
   O.writeU32(CallSites.size());
   for (const CallSiteInfo &CSI : CallSites)
-    if (Error Err = CSI.encode(O))
+    if (Error Err = CSI.encode(O, StringOffsetSize))
       return Err;
 
   return Error::success();
 }
 
 Expected<CallSiteInfoCollection>
-CallSiteInfoCollection::decode(DataExtractor &Data) {
+CallSiteInfoCollection::decode(DataExtractor &Data,
+                               uint8_t StringOffsetSize) {
   CallSiteInfoCollection CSC;
   uint64_t Offset = 0;
 
@@ -90,7 +93,8 @@ CallSiteInfoCollection::decode(DataExtractor &Data) {
 
   CSC.CallSites.reserve(NumCallSites);
   for (uint32_t i = 0; i < NumCallSites; ++i) {
-    Expected<CallSiteInfo> ECSI = CallSiteInfo::decode(Data, Offset);
+    Expected<CallSiteInfo> ECSI =
+        CallSiteInfo::decode(Data, Offset, StringOffsetSize);
     if (!ECSI)
       return ECSI.takeError();
     CSC.CallSites.emplace_back(*ECSI);

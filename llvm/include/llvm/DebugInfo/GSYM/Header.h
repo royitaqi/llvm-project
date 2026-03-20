@@ -24,7 +24,8 @@ class FileWriter;
 
 constexpr uint32_t GSYM_MAGIC = 0x4753594d; // 'GSYM'
 constexpr uint32_t GSYM_CIGAM = 0x4d595347; // 'MYSG'
-constexpr uint32_t GSYM_VERSION = 1;
+constexpr uint32_t GSYM_VERSION_1 = 1;
+constexpr uint32_t GSYM_VERSION = 2;
 constexpr size_t GSYM_MAX_UUID_SIZE = 20;
 
 /// The GSYM header.
@@ -63,6 +64,12 @@ struct Header {
   uint64_t BaseAddress;
   /// The number of addresses stored in the address offsets table.
   uint32_t NumAddresses;
+  /// The size in bytes of each function info offset in the address info
+  /// offsets table. Valid values are 4-8 in version 2.
+  uint8_t FuncInfoOffsetSize;
+  /// The size in bytes of each string table offset in all encoded data.
+  /// Valid values are 2-8 in version 2.
+  uint8_t StringOffsetSize;
   /// The file relative offset of the start of the string table for strings
   /// contained in the GSYM file. If the GSYM in contained in a stand alone
   /// file this will be the file offset of the start of the string table. If
@@ -70,7 +77,7 @@ struct Header {
   /// be the offset of the first string used in the GSYM file and can possibly
   /// span one or more executable string tables. This allows the strings to
   /// share string tables in an ELF or mach-o file.
-  uint32_t StrtabOffset;
+  uint64_t StrtabOffset;
   /// The size in bytes of the string table. For a stand alone GSYM file, this
   /// will be the exact size in bytes of the string table. When the GSYM data
   /// is in a section within an executable file, this size can span one or more
@@ -78,7 +85,7 @@ struct Header {
   /// stored in the executable file to be re-used, and any extra strings could
   /// be added to another string table and the string table offset and size
   /// can be set to span all needed string tables.
-  uint32_t StrtabSize;
+  uint64_t StrtabSize;
   /// The UUID of the original executable file. This is stored to allow
   /// matching a GSYM file to an executable file when symbolication is
   /// required. Only the first "UUIDSize" bytes of the UUID are valid. Any

@@ -92,7 +92,7 @@ class GsymReader;
 /// Where "N" is the number of tuples.
 struct FunctionInfo {
   AddressRange Range;
-  uint32_t Name; ///< String table offset in the string table.
+  uint64_t Name; ///< String table offset in the string table.
   std::optional<LineTable> OptLineTable;
   std::optional<InlineInfo> Inline;
   std::optional<MergedFunctionsInfo> MergedFunctions;
@@ -102,7 +102,7 @@ struct FunctionInfo {
   /// GSYM file.
   SmallString<32> EncodingCache;
 
-  FunctionInfo(uint64_t Addr = 0, uint64_t Size = 0, uint32_t N = 0)
+  FunctionInfo(uint64_t Addr = 0, uint64_t Size = 0, uint64_t N = 0)
       : Range(Addr, Addr + Size), Name(N) {}
 
   /// Query if a FunctionInfo has rich debug info.
@@ -139,8 +139,8 @@ struct FunctionInfo {
   ///
   /// \returns An FunctionInfo or an error describing the issue that was
   /// encountered during decoding.
-  LLVM_ABI static llvm::Expected<FunctionInfo> decode(DataExtractor &Data,
-                                                      uint64_t BaseAddr);
+  LLVM_ABI static llvm::Expected<FunctionInfo>
+  decode(DataExtractor &Data, uint64_t BaseAddr, uint8_t StringOffsetSize = 4);
 
   /// Encode this object into FileWriter stream.
   ///
@@ -156,8 +156,9 @@ struct FunctionInfo {
   ///
   /// \returns An error object that indicates failure or the offset of the
   /// function info that was successfully written into the stream.
-  LLVM_ABI llvm::Expected<uint64_t> encode(FileWriter &O,
-                                           bool NoPadding = false) const;
+  LLVM_ABI llvm::Expected<uint64_t>
+  encode(FileWriter &O, bool NoPadding = false,
+         uint8_t StringOffsetSize = 4) const;
 
   /// Encode this function info into the internal byte cache and return the size
   /// in bytes.

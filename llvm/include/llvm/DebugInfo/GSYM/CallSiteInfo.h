@@ -45,7 +45,7 @@ struct CallSiteInfo {
   uint64_t ReturnOffset = 0;
 
   /// Offsets into the string table for function names regex patterns.
-  std::vector<uint32_t> MatchRegex;
+  std::vector<uint64_t> MatchRegex;
 
   /// Bitwise OR of CallSiteInfo::Flags values
   uint8_t Flags = CallSiteInfo::Flags::None;
@@ -64,14 +64,16 @@ struct CallSiteInfo {
   /// \param Data The binary stream to read the data from.
   /// \param Offset The current offset within the data stream.
   /// \returns A CallSiteInfo or an error describing the issue.
-  LLVM_ABI static llvm::Expected<CallSiteInfo> decode(DataExtractor &Data,
-                                                      uint64_t &Offset);
+  LLVM_ABI static llvm::Expected<CallSiteInfo>
+  decode(DataExtractor &Data, uint64_t &Offset, uint8_t StringOffsetSize = 4);
 
   /// Encode this CallSiteInfo object into a FileWriter stream.
   ///
   /// \param O The binary stream to write the data to.
+  /// \param StringOffsetSize The byte size for string table offsets.
   /// \returns An error object that indicates success or failure.
-  LLVM_ABI llvm::Error encode(FileWriter &O) const;
+  LLVM_ABI llvm::Error encode(FileWriter &O,
+                              uint8_t StringOffsetSize = 4) const;
 };
 
 struct CallSiteInfoCollection {
@@ -82,13 +84,15 @@ struct CallSiteInfoCollection {
   /// \param Data The binary stream to read the data from.
   /// \returns A CallSiteInfoCollection or an error describing the issue.
   LLVM_ABI static llvm::Expected<CallSiteInfoCollection>
-  decode(DataExtractor &Data);
+  decode(DataExtractor &Data, uint8_t StringOffsetSize = 4);
 
   /// Encode this CallSiteInfoCollection object into a FileWriter stream.
   ///
   /// \param O The binary stream to write the data to.
+  /// \param StringOffsetSize The byte size for string table offsets.
   /// \returns An error object that indicates success or failure.
-  LLVM_ABI llvm::Error encode(FileWriter &O) const;
+  LLVM_ABI llvm::Error encode(FileWriter &O,
+                              uint8_t StringOffsetSize = 4) const;
 };
 
 class CallSiteInfoLoader {

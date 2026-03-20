@@ -95,6 +95,19 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
   if (!BaseAddress)
     return createStringError(std::errc::invalid_argument,
                              "invalid base address");
+  // Compute StringOffsetSize based on string table size.
+  // Minimum is 4 to match the default used by cacheEncoding() for segments.
+  const uint64_t StrtabEstSize = StrTab.getSize();
+  uint8_t StringOffsetSize;
+  if (StrtabEstSize <= UINT32_MAX)
+    StringOffsetSize = 4;
+  else
+    StringOffsetSize = 8;
+
+  // Use FuncInfoOffsetSize=4 for files < 4GB, 8 otherwise.
+  // We'll verify after writing and error if 4 was insufficient.
+  uint8_t FuncInfoOffsetSize = 4;
+
   Header Hdr;
   Hdr.Magic = GSYM_MAGIC;
   Hdr.Version = GSYM_VERSION;
@@ -102,6 +115,8 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
   Hdr.UUIDSize = static_cast<uint8_t>(UUID.size());
   Hdr.BaseAddress = *BaseAddress;
   Hdr.NumAddresses = static_cast<uint32_t>(Funcs.size());
+  Hdr.FuncInfoOffsetSize = FuncInfoOffsetSize;
+  Hdr.StringOffsetSize = StringOffsetSize;
   Hdr.StrtabOffset = 0; // We will fix this up later.
   Hdr.StrtabSize = 0;   // We will fix this up later.
   memset(Hdr.UUID, 0, sizeof(Hdr.UUID));
@@ -143,13 +158,13 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
     }
   }
 
-  // Write out all zeros for the AddrInfoOffsets.
-  O.alignTo(4);
+  // Write out all zeros for the AddrInfoOffsets (variable size per entry).
+  O.alignTo(FuncInfoOffsetSize);
   const off_t AddrInfoOffsetsOffset = O.tell();
   for (size_t i = 0, n = Funcs.size(); i < n; ++i)
-    O.writeU32(0);
+    O.writeUnsigned(0, FuncInfoOffsetSize);
 
-  // Write out the file table
+  // Write out the file table with variable-size string offset entries.
   O.alignTo(4);
   assert(!Files.empty());
   assert(Files[0].Dir == 0);
@@ -159,46 +174,43 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
     return createStringError(std::errc::invalid_argument, "too many files");
   O.writeU32(static_cast<uint32_t>(NumFiles));
   for (auto File : Files) {
-    O.writeU32(File.Dir);
-    O.writeU32(File.Base);
+    O.writeUnsigned(File.Dir, StringOffsetSize);
+    O.writeUnsigned(File.Base, StringOffsetSize);
   }
 
   // Write out the string table.
   const off_t StrtabOffset = O.tell();
   StrTab.write(O.get_stream());
   const off_t StrtabSize = O.tell() - StrtabOffset;
-  std::vector<uint32_t> AddrInfoOffsets;
-
-  // Verify that the size of the string table does not exceed 32-bit max.
-  // This means the offsets in the string table will not exceed 32-bit max.
-  if (StrtabSize > UINT32_MAX) {
-    return createStringError(std::errc::invalid_argument,
-                             "string table size exceeded 32-bit max");
-  }
+  std::vector<uint64_t> AddrInfoOffsets;
 
   // Write out the address infos for each function info.
   for (const auto &FuncInfo : Funcs) {
-    if (Expected<uint64_t> OffsetOrErr = FuncInfo.encode(O)) {
-      // Verify that the address info offsets do not exceed 32-bit max.
+    if (Expected<uint64_t> OffsetOrErr =
+            FuncInfo.encode(O, /*NoPadding=*/false, StringOffsetSize)) {
       uint64_t Offset = OffsetOrErr.get();
-      if (Offset > UINT32_MAX) {
+      if (FuncInfoOffsetSize == 4 && Offset > UINT32_MAX) {
         return createStringError(std::errc::invalid_argument,
-                                 "address info offset exceeded 32-bit max");
+                                 "address info offset 0x%" PRIx64
+                                 " exceeded 32-bit max",
+                                 Offset);
       }
-
       AddrInfoOffsets.push_back(Offset);
     } else
       return OffsetOrErr.takeError();
   }
-  // Fixup the string table offset and size in the header
-  O.fixup32((uint32_t)StrtabOffset, offsetof(Header, StrtabOffset));
-  O.fixup32((uint32_t)StrtabSize, offsetof(Header, StrtabSize));
+  // Fixup the string table offset and size in the header (V2 uses uint64_t).
+  O.fixup64(static_cast<uint64_t>(StrtabOffset),
+            offsetof(Header, StrtabOffset));
+  O.fixup64(static_cast<uint64_t>(StrtabSize),
+            offsetof(Header, StrtabSize));
 
-  // Fixup all address info offsets
+  // Fixup all address info offsets (variable size per entry).
   uint64_t Offset = 0;
   for (auto AddrInfoOffset : AddrInfoOffsets) {
-    O.fixup32(AddrInfoOffset, AddrInfoOffsetsOffset + Offset);
-    Offset += 4;
+    O.fixupUnsigned(AddrInfoOffset, AddrInfoOffsetsOffset + Offset,
+                    FuncInfoOffsetSize);
+    Offset += FuncInfoOffsetSize;
   }
   return ErrorSuccess();
 }
@@ -494,14 +506,16 @@ uint8_t GsymCreator::getAddressOffsetSize() const {
 }
 
 uint64_t GsymCreator::calculateHeaderAndTableSize() const {
-  uint64_t Size = sizeof(Header);
+  // V2 header is 60 bytes.
+  uint64_t Size = 60;
   const size_t NumFuncs = Funcs.size();
   // Add size of address offset table
   Size += NumFuncs * getAddressOffsetSize();
-  // Add size of address info offsets which are 32 bit integers in version 1.
-  Size += NumFuncs * sizeof(uint32_t);
-  // Add file table size
-  Size += Files.size() * sizeof(FileEntry);
+  // Add size of address info offsets (4 bytes per entry by default).
+  Size += NumFuncs * 4;
+  // Add file table size: count (4) + entries (2 * StringOffsetSize per entry).
+  // Use 4 bytes per string offset as a conservative estimate.
+  Size += 4 + Files.size() * (2 * 4);
   // Add string table size
   Size += StrTab.getSize();
 
