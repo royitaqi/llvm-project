@@ -141,6 +141,50 @@ llvm::Error Header::encode(FileWriter &O) const {
   return Error::success();
 }
 
+llvm::Error HeaderV1::checkForError() const {
+  if (Magic != GSYM_MAGIC)
+    return createStringError(std::errc::invalid_argument,
+                             "invalid GSYM magic 0x%8.8x", Magic);
+  if (Version != GSYM_VERSION_1)
+    return createStringError(std::errc::invalid_argument,
+                             "unsupported GSYM version %u", Version);
+  switch (AddrOffSize) {
+    case 1: break;
+    case 2: break;
+    case 4: break;
+    case 8: break;
+    default:
+        return createStringError(std::errc::invalid_argument,
+                                 "invalid address offset size %u",
+                                 AddrOffSize);
+  }
+  if (UUIDSize > GSYM_MAX_UUID_SIZE)
+    return createStringError(std::errc::invalid_argument,
+                             "invalid UUID size %u", UUIDSize);
+  return Error::success();
+}
+
+llvm::Expected<HeaderV1> HeaderV1::decode(DataExtractor &Data) {
+  uint64_t Offset = 0;
+  if (!Data.isValidOffsetForDataOfSize(Offset, sizeof(HeaderV1)))
+    return createStringError(std::errc::invalid_argument,
+                             "not enough data for a v1 gsym::Header");
+  HeaderV1 H;
+  H.Magic = Data.getU32(&Offset);
+  H.Version = Data.getU16(&Offset);
+  H.AddrOffSize = Data.getU8(&Offset);
+  H.UUIDSize = Data.getU8(&Offset);
+  H.BaseAddress = Data.getU64(&Offset);
+  H.NumAddresses = Data.getU32(&Offset);
+  H.StrtabOffset = Data.getU32(&Offset);
+  H.StrtabSize = Data.getU32(&Offset);
+  Data.getU8(&Offset, H.UUID, GSYM_MAX_UUID_SIZE);
+  if (llvm::Error Err = H.checkForError())
+    return std::move(Err);
+  memset(H.UUID + H.UUIDSize, 0, GSYM_MAX_UUID_SIZE - H.UUIDSize);
+  return H;
+}
+
 bool llvm::gsym::operator==(const Header &LHS, const Header &RHS) {
   return LHS.Magic == RHS.Magic && LHS.Version == RHS.Version &&
       LHS.AddrOffSize == RHS.AddrOffSize && LHS.UUIDSize == RHS.UUIDSize &&

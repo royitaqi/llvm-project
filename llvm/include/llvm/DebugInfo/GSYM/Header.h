@@ -131,6 +131,22 @@ struct Header {
 LLVM_ABI bool operator==(const Header &LHS, const Header &RHS);
 LLVM_ABI raw_ostream &operator<<(raw_ostream &OS, const llvm::gsym::Header &H);
 
+/// The on-disk GSYM V1 header (48 bytes).
+struct HeaderV1 {
+  uint32_t Magic;
+  uint16_t Version;
+  uint8_t AddrOffSize;
+  uint8_t UUIDSize;
+  uint64_t BaseAddress;
+  uint32_t NumAddresses;
+  uint32_t StrtabOffset;
+  uint32_t StrtabSize;
+  uint8_t UUID[GSYM_MAX_UUID_SIZE];
+
+  LLVM_ABI llvm::Error checkForError() const;
+  LLVM_ABI static llvm::Expected<HeaderV1> decode(DataExtractor &Data);
+};
+
 } // namespace gsym
 } // namespace llvm
 
