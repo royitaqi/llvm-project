@@ -25,7 +25,7 @@ class FileWriter;
 constexpr uint32_t GSYM_MAGIC = 0x4753594d; // 'GSYM'
 constexpr uint32_t GSYM_CIGAM = 0x4d595347; // 'MYSG'
 constexpr uint32_t GSYM_VERSION_1 = 1;
-constexpr uint32_t GSYM_VERSION = 2;
+constexpr uint32_t GSYM_VERSION_2 = 2;
 constexpr size_t GSYM_MAX_UUID_SIZE = 20;
 
 /// The GSYM header.

@@ -50,7 +50,8 @@ class GsymReader {
   StringRef GsymBytes;
   llvm::endianness Endian;
   const Header *Hdr = nullptr;
-  Header OwnedHdr; ///< Storage for decoded header (always used).
+  /// Storage for the header when the GSYM file has a previous version.
+  Header OwnedHdr;
   ArrayRef<uint8_t> AddrOffsets;
   std::vector<uint64_t> AddrInfoOffsets;
   std::vector<FileEntry> DecodedFiles;
