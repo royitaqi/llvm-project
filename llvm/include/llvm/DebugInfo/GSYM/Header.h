@@ -28,6 +28,8 @@ constexpr uint32_t GSYM_VERSION_1 = 1;
 constexpr uint32_t GSYM_VERSION_2 = 2;
 constexpr size_t GSYM_MAX_UUID_SIZE = 20;
 
+struct HeaderV1;
+
 /// The GSYM header.
 ///
 /// The GSYM header is found at the start of a stand alone GSYM file, or as
@@ -62,14 +64,6 @@ struct Header {
   /// table are relative to. Storing a full 64 bit address allows our address
   /// offsets table to be smaller on disk.
   uint64_t BaseAddress;
-  /// The number of addresses stored in the address offsets table.
-  uint32_t NumAddresses;
-  /// The size in bytes of each function info offset in the address info
-  /// offsets table. Valid values are 4-8 in version 2.
-  uint8_t FuncInfoOffsetSize;
-  /// The size in bytes of each string table offset in all encoded data.
-  /// Valid values are 2-8 in version 2.
-  uint8_t StringOffsetSize;
   /// The file relative offset of the start of the string table for strings
   /// contained in the GSYM file. If the GSYM in contained in a stand alone
   /// file this will be the file offset of the start of the string table. If
@@ -86,12 +80,23 @@ struct Header {
   /// be added to another string table and the string table offset and size
   /// can be set to span all needed string tables.
   uint64_t StrtabSize;
+  /// The number of addresses stored in the address offsets table.
+  uint32_t NumAddresses;
+  /// The size in bytes of each function info offset in the address info
+  /// offsets table. Valid values are 4-8 in version 2.
+  uint8_t FuncInfoOffsetSize;
+  /// The size in bytes of each string table offset in all encoded data.
+  /// Valid values are 2-8 in version 2.
+  uint8_t StringOffsetSize;
   /// The UUID of the original executable file. This is stored to allow
   /// matching a GSYM file to an executable file when symbolication is
   /// required. Only the first "UUIDSize" bytes of the UUID are valid. Any
   /// bytes in the UUID value that appear after the first UUIDSize bytes should
   /// be set to zero.
   uint8_t UUID[GSYM_MAX_UUID_SIZE];
+  /// Reserved padding bytes to ensure sizeof(Header) == 64 with no implicit
+  /// compiler padding, allowing the V2 header to be mmap'ed directly.
+  uint8_t Pad[6];
 
   /// Check if a header is valid and return an error if anything is wrong.
   ///
@@ -126,6 +131,15 @@ struct Header {
   /// \returns An error object that indicates success or failure of the
   /// encoding process.
   LLVM_ABI llvm::Error encode(FileWriter &O) const;
+
+  /// Normalize a V1 header into a V2-style Header.
+  ///
+  /// This converts a HeaderV1 into a Header by copying common fields and
+  /// setting V2-specific fields to default values.
+  ///
+  /// \param V1H The V1 header to normalize.
+  /// \returns A Header with the V1 fields and default V2 fields.
+  LLVM_ABI static Header normalize(const HeaderV1 &V1H);
 };
 
 LLVM_ABI bool operator==(const Header &LHS, const Header &RHS);

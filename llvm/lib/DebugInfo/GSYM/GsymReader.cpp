@@ -15,6 +15,7 @@
 
 #include "llvm/DebugInfo/GSYM/InlineInfo.h"
 #include "llvm/DebugInfo/GSYM/LineTable.h"
+#include "llvm/Support/BinaryStreamReader.h"
 #include "llvm/Support/DataExtractor.h"
 #include "llvm/Support/MemoryBuffer.h"
 
@@ -30,8 +31,14 @@ GsymReader::GsymReader(GsymReader &&RHS) noexcept
       AddrInfoOffsets(std::move(RHS.AddrInfoOffsets)),
       DecodedFiles(std::move(RHS.DecodedFiles)), StrTab(RHS.StrTab),
       Swap(std::move(RHS.Swap)) {
-  // OwnedHdr was copied, so Hdr must point to our own copy.
-  Hdr = &OwnedHdr;
+  // OwnedHdr was copied to a new address, so fix up Hdr if it pointed there.
+  // For other cases (pointing into MemBuffer or Swap->Hdr), the underlying
+  // memory is unchanged by the move — only ownership of the unique_ptr
+  // transferred — so the pointer remains valid.
+  if (RHS.Hdr == &RHS.OwnedHdr)
+    Hdr = &OwnedHdr;
+  else
+    Hdr = RHS.Hdr;
 }
 
 GsymReader::~GsymReader() = default;
@@ -93,44 +100,53 @@ GsymReader::parse() {
   // Read the header. This is done in two layers. The first layer is the
   // version of the header. The second layer is the swap, i.e. the endian-ness
   // of the bytes.
-  if (Hdr->Version == GSYM_VERSION_2) {
+  // When byte-swapped, Hdr->Version is in the wrong endianness, so swap it.
+  uint16_t Version = Hdr->Version;
+  if (Swap)
+    Version = llvm::byteswap(Version);
+
+  if (Version == GSYM_VERSION_2) {
     // Unswapped V2 header is already read via the above mmap'ed FileData.
     // The following code is for the swapped case.
     if (Swap) {
-      DataExtractor Data(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
-      if (auto ExpectedHdr = Header::decode(Data))
+      DataExtractor DE(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
+      if (auto ExpectedHdr = Header::decode(DE))
         Swap->Hdr = ExpectedHdr.get();
       else
         return ExpectedHdr.takeError();
       Hdr = &Swap->Hdr;
     }
-  } if (Hdr->Version == GSYM_VERSION_1) {
+  } else if (Version == GSYM_VERSION_1) {
     if (Swap) {
-      DataExtractor Data(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
-      if (auto ExpectedHdr = HeaderV1::decode(Data)) {
-        OwnedHdr.normalize(*ExpectedHdr);
+      DataExtractor DE(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
+      if (auto ExpectedHdr = HeaderV1::decode(DE)) {
+        OwnedHdr = Header::normalize(*ExpectedHdr);
         Hdr = &OwnedHdr;
       } else
         return ExpectedHdr.takeError();
     } else {
-      const Header *V1Hdr = nullptr;
-      FileData.setoffset(0);
+      const HeaderV1 *V1Hdr = nullptr;
+      FileData.setOffset(0);
       if (FileData.readObject(V1Hdr))
-      return createStringError(std::errc::invalid_argument,
-                              "not enough data for a GSYM header");
-      OwnedHdr.normalize(*V1Hdr);
+        return createStringError(std::errc::invalid_argument,
+                                "not enough data for a GSYM header");
+      OwnedHdr = Header::normalize(*V1Hdr);
       Hdr = &OwnedHdr;
     }
   } else {
     return createStringError(std::errc::invalid_argument,
-                             "unsupported GSYM version %u", Hdr->Version);
+                             "unsupported GSYM version %u", Version);
   }
   // Detect errors in the header and report any that are found.
   if (Error Err = Hdr->checkForError())
     return Err;
 
+  // Create a DataExtractor for reading the rest of the file tables.
+  DataExtractor Data(MemBuffer->getBuffer(),
+                     Endian == llvm::endianness::little, 4);
+
   // Determine the header size based on version.
-  const uint64_t HeaderSize = (Hdr->Version == GSYM_VERSION_1) ? 48 : 60;
+  const uint64_t HeaderSize = (Hdr->Version == GSYM_VERSION_1) ? 48 : 64;
   const uint8_t FuncInfoOffsetSize = Hdr->FuncInfoOffsetSize;
   const uint8_t StringOffsetSize = Hdr->StringOffsetSize;
 

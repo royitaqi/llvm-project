@@ -110,7 +110,7 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
 
   Header Hdr;
   Hdr.Magic = GSYM_MAGIC;
-  Hdr.Version = GSYM_VERSION;
+  Hdr.Version = GSYM_VERSION_2;
   Hdr.AddrOffSize = getAddressOffsetSize();
   Hdr.UUIDSize = static_cast<uint8_t>(UUID.size());
   Hdr.BaseAddress = *BaseAddress;
@@ -506,8 +506,8 @@ uint8_t GsymCreator::getAddressOffsetSize() const {
 }
 
 uint64_t GsymCreator::calculateHeaderAndTableSize() const {
-  // V2 header is 60 bytes.
-  uint64_t Size = 60;
+  // V2 header is 64 bytes.
+  uint64_t Size = 64;
   const size_t NumFuncs = Funcs.size();
   // Add size of address offset table
   Size += NumFuncs * getAddressOffsetSize();
