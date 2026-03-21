@@ -139,103 +139,107 @@ GsymReader::parse() {
                              "unsupported GSYM version %u", Version);
   }
 
-  // Detect errors in the header and report any that are found.
+  // Detect errors in the header and report any that are found. If we make it
+  // past this without errors, we know we have a good magic value, a supported
+  // version number, verified address offset size and a valid UUID size.
   if (Error Err = Hdr->checkForError())
     return Err;
 
-  // Create a DataExtractor for reading the rest of the file tables.
-  DataExtractor Data(MemBuffer->getBuffer(),
-                     Endian == llvm::endianness::little, 4);
+  if (!Swap) {
+    // This is the native endianness case that is most common and optimized for
+    // efficient lookups. Here we just grab pointers to the native data and
+    // use ArrayRef objects to allow efficient read only access.
 
-  // Determine the header size based on version.
-  const uint64_t HeaderSize = (Hdr->Version == GSYM_VERSION_1) ? 48 : 64;
-  const uint8_t FuncInfoOffsetSize = Hdr->FuncInfoOffsetSize;
-  const uint8_t StringOffsetSize = Hdr->StringOffsetSize;
-
-  // Read address offsets table.
-  {
-    uint64_t Offset = alignTo(HeaderSize, Hdr->AddrOffSize);
-    const uint64_t AddrTableSize =
-        static_cast<uint64_t>(Hdr->NumAddresses) * Hdr->AddrOffSize;
-    if (!Data.isValidOffsetForDataOfSize(Offset, AddrTableSize))
+    // Read the address offsets.
+    if (FileData.padToAlignment(Hdr->AddrOffSize) ||
+        FileData.readArray(AddrOffsets,
+                           Hdr->NumAddresses * Hdr->AddrOffSize))
       return createStringError(std::errc::invalid_argument,
-                               "failed to read address table");
-    // For native endianness, point directly into the buffer.
-    if (!Swap) {
-      AddrOffsets = ArrayRef<uint8_t>(
-          reinterpret_cast<const uint8_t *>(
-              MemBuffer->getBufferStart() + Offset),
-          AddrTableSize);
-    } else {
-      Swap->AddrOffsets.resize(AddrTableSize);
-      switch (Hdr->AddrOffSize) {
-        case 1:
-          Data.getU8(&Offset, Swap->AddrOffsets.data(), Hdr->NumAddresses);
-          break;
-        case 2:
-          Data.getU16(&Offset,
-                      reinterpret_cast<uint16_t *>(Swap->AddrOffsets.data()),
-                      Hdr->NumAddresses);
-          break;
-        case 4:
-          Data.getU32(&Offset,
-                      reinterpret_cast<uint32_t *>(Swap->AddrOffsets.data()),
-                      Hdr->NumAddresses);
-          break;
-        case 8:
-          Data.getU64(&Offset,
-                      reinterpret_cast<uint64_t *>(Swap->AddrOffsets.data()),
-                      Hdr->NumAddresses);
-          break;
-      }
-      AddrOffsets = ArrayRef<uint8_t>(Swap->AddrOffsets);
-    }
-  }
+                              "failed to read address table");
 
-  // Read the address info offsets table (variable-size entries).
-  {
-    uint64_t Offset =
-        alignTo(alignTo(HeaderSize, Hdr->AddrOffSize) +
-                    static_cast<uint64_t>(Hdr->NumAddresses) * Hdr->AddrOffSize,
-                FuncInfoOffsetSize);
-    AddrInfoOffsets.resize(Hdr->NumAddresses);
-    for (uint32_t I = 0; I < Hdr->NumAddresses; ++I) {
-      if (!Data.isValidOffsetForDataOfSize(Offset, FuncInfoOffsetSize))
-        return createStringError(std::errc::invalid_argument,
-                                "failed to read address info offsets table");
-      AddrInfoOffsets[I] = Data.getUnsigned(&Offset, FuncInfoOffsetSize);
-    }
-  }
+    // Read the address info offsets.
+    if (FileData.padToAlignment(4) ||
+        FileData.readArray(AddrInfoOffsets, Hdr->NumAddresses))
+      return createStringError(std::errc::invalid_argument,
+                              "failed to read address info offsets table");
 
-  // Read the file table (variable-size string offset entries).
-  {
-    uint64_t Offset =
-        alignTo(HeaderSize, Hdr->AddrOffSize) +
-        static_cast<uint64_t>(Hdr->NumAddresses) * Hdr->AddrOffSize;
-    Offset = alignTo(Offset, FuncInfoOffsetSize) +
-             static_cast<uint64_t>(Hdr->NumAddresses) * FuncInfoOffsetSize;
-    if (!Data.isValidOffsetForDataOfSize(Offset, 4))
+    // Read the file table.
+    uint32_t NumFiles = 0;
+    if (FileData.readInteger(NumFiles) || FileData.readArray(Files, NumFiles))
       return createStringError(std::errc::invalid_argument,
                               "failed to read file table");
-    const uint32_t NumFiles = Data.getU32(&Offset);
-    DecodedFiles.resize(NumFiles);
-    for (uint32_t I = 0; I < NumFiles; ++I) {
-      if (!Data.isValidOffsetForDataOfSize(Offset, StringOffsetSize * 2))
+
+    // Get the string table.
+    FileData.setOffset(Hdr->StrtabOffset);
+    if (FileData.readFixedString(StrTab.Data, Hdr->StrtabSize))
+      return createStringError(std::errc::invalid_argument,
+                              "failed to read string table");
+} else {
+  // This is the non native endianness case that is not common and not
+  // optimized for lookups. Here we decode the important tables into local
+  // storage and then set the ArrayRef objects to point to these swapped
+  // copies of the read only data so lookups can be as efficient as possible.
+  DataExtractor Data(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
+
+  // Read the address offsets.
+  uint64_t Offset = alignTo(sizeof(Header), Hdr->AddrOffSize);
+  Swap->AddrOffsets.resize(Hdr->NumAddresses * Hdr->AddrOffSize);
+  switch (Hdr->AddrOffSize) {
+    case 1:
+      if (!Data.getU8(&Offset, Swap->AddrOffsets.data(), Hdr->NumAddresses))
         return createStringError(std::errc::invalid_argument,
-                                "failed to read file table");
-      DecodedFiles[I].Dir = Data.getUnsigned(&Offset, StringOffsetSize);
-      DecodedFiles[I].Base = Data.getUnsigned(&Offset, StringOffsetSize);
+                                  "failed to read address table");
+      break;
+    case 2:
+      if (!Data.getU16(&Offset,
+                        reinterpret_cast<uint16_t *>(Swap->AddrOffsets.data()),
+                        Hdr->NumAddresses))
+        return createStringError(std::errc::invalid_argument,
+                                  "failed to read address table");
+      break;
+    case 4:
+      if (!Data.getU32(&Offset,
+                        reinterpret_cast<uint32_t *>(Swap->AddrOffsets.data()),
+                        Hdr->NumAddresses))
+        return createStringError(std::errc::invalid_argument,
+                                  "failed to read address table");
+      break;
+    case 8:
+      if (!Data.getU64(&Offset,
+                        reinterpret_cast<uint64_t *>(Swap->AddrOffsets.data()),
+                        Hdr->NumAddresses))
+        return createStringError(std::errc::invalid_argument,
+                                  "failed to read address table");
     }
+    AddrOffsets = ArrayRef<uint8_t>(Swap->AddrOffsets);
+
+    // Read the address info offsets.
+    Offset = alignTo(Offset, 4);
+    Swap->AddrInfoOffsets.resize(Hdr->NumAddresses);
+    if (Data.getU32(&Offset, Swap->AddrInfoOffsets.data(), Hdr->NumAddresses))
+      AddrInfoOffsets = ArrayRef<uint32_t>(Swap->AddrInfoOffsets);
+    else
+      return createStringError(std::errc::invalid_argument,
+                               "failed to read address table");
+    // Read the file table.
+    const uint32_t NumFiles = Data.getU32(&Offset);
+    if (NumFiles > 0) {
+      Swap->Files.resize(NumFiles);
+      if (Data.getU32(&Offset, &Swap->Files[0].Dir, NumFiles*2))
+        Files = ArrayRef<FileEntry>(Swap->Files);
+      else
+        return createStringError(std::errc::invalid_argument,
+                                 "failed to read file table");
+    }
+    // Get the string table.
+    StrTab.Data = MemBuffer->getBuffer().substr(Hdr->StrtabOffset,
+                                                Hdr->StrtabSize);
+    if (StrTab.Data.empty())
+      return createStringError(std::errc::invalid_argument,
+                               "failed to read string table");
   }
-
-  // Get the string table.
-  StrTab.Data = MemBuffer->getBuffer().substr(Hdr->StrtabOffset,
-                                              Hdr->StrtabSize);
-  if (StrTab.Data.empty())
-    return createStringError(std::errc::invalid_argument,
-                             "failed to read string table");
-
   return Error::success();
+
 }
 
 const Header &GsymReader::getHeader() const {

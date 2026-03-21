@@ -63,6 +63,8 @@ class GsymReader {
   struct SwappedData {
     Header Hdr;
     std::vector<uint8_t> AddrOffsets;
+    std::vector<uint32_t> AddrInfoOffsets;
+    std::vector<FileEntry> Files;
   };
   std::unique_ptr<SwappedData> Swap;
 
