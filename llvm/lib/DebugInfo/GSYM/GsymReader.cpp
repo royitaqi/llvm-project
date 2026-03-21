@@ -97,14 +97,14 @@ GsymReader::parse() {
   }
   bool DataIsLittleEndian = HostByteOrder != llvm::endianness::little;
 
-  // Read the header. This is done in two layers. The first layer is the
-  // version of the header. The second layer is the swap, i.e. the endian-ness
-  // of the bytes.
   // When byte-swapped, Hdr->Version is in the wrong endianness, so swap it.
   uint16_t Version = Hdr->Version;
   if (Swap)
     Version = llvm::byteswap(Version);
 
+  // Read the header. This is done in two layers. The first layer is the
+  // version of the header. The second layer is the swap, i.e. the endian-ness
+  // of the bytes.
   if (Version == GSYM_VERSION_2) {
     // Unswapped V2 header is already read via the above mmap'ed FileData.
     // The following code is for the swapped case.
@@ -117,26 +117,28 @@ GsymReader::parse() {
       Hdr = &Swap->Hdr;
     }
   } else if (Version == GSYM_VERSION_1) {
+    // Read V1 header, then normalize into V2 header.
     if (Swap) {
       DataExtractor DE(MemBuffer->getBuffer(), DataIsLittleEndian, 4);
-      if (auto ExpectedHdr = HeaderV1::decode(DE)) {
+      if (auto ExpectedHdr = HeaderV1::decode(DE))
         OwnedHdr = Header::normalize(*ExpectedHdr);
-        Hdr = &OwnedHdr;
-      } else
+      else
         return ExpectedHdr.takeError();
     } else {
+      // Unswapped V1 header is directly readable from the mmap'ed FileData.
       const HeaderV1 *V1Hdr = nullptr;
       FileData.setOffset(0);
       if (FileData.readObject(V1Hdr))
         return createStringError(std::errc::invalid_argument,
                                 "not enough data for a GSYM header");
       OwnedHdr = Header::normalize(*V1Hdr);
-      Hdr = &OwnedHdr;
     }
+    Hdr = &OwnedHdr;
   } else {
     return createStringError(std::errc::invalid_argument,
                              "unsupported GSYM version %u", Version);
   }
+
   // Detect errors in the header and report any that are found.
   if (Error Err = Hdr->checkForError())
     return Err;
