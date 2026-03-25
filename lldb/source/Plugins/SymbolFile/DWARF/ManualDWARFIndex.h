@@ -20,6 +20,7 @@ namespace dwarf {
 class DWARFDebugInfo;
 class SymbolFileDWARFDwo;
 
+/// Implementation of DWARFIndex by manually parsing DWARF debug info.
 class ManualDWARFIndex : public DWARFIndex {
 public:
   ManualDWARFIndex(Module &module, SymbolFileDWARF &dwarf,

@@ -15,6 +15,7 @@
 #include "lldb/Interpreter/Options.h"
 #include "lldb/Target/RemoteAwarePlatform.h"
 
+/// Base platform plugin providing common POSIX platform functionality.
 class PlatformPOSIX : public lldb_private::RemoteAwarePlatform {
 public:
   PlatformPOSIX(bool is_host);

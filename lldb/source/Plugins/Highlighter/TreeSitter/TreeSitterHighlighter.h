@@ -20,6 +20,7 @@ namespace lldb_private {
 
 struct TSState;
 
+/// Base class for syntax highlighters using Tree-sitter parsing.
 class TreeSitterHighlighter : public Highlighter {
 public:
   TreeSitterHighlighter() = default;

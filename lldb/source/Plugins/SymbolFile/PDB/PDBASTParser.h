@@ -40,6 +40,7 @@ class PDBSymbolTypeUDT;
 } // namespace pdb
 } // namespace llvm
 
+/// Parser for converting PDB type records to Clang AST types.
 class PDBASTParser {
 public:
   PDBASTParser(lldb_private::TypeSystemClang &ast);

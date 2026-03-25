@@ -23,6 +23,7 @@ namespace lldb_private::plugin {
 namespace dwarf {
 class DWARFContext;
 
+/// Container and accessor for all DWARF compile units in a module.
 class DWARFDebugInfo {
 public:
   typedef dw_offset_t (*Callback)(SymbolFileDWARF *dwarf2Data, DWARFUnit *cu,

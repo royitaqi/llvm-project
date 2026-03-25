@@ -34,6 +34,7 @@ namespace lldb_private {
 class TypeSystemClang;
 class UtilityFunction;
 
+/// Language runtime plugin for Objective-C.
 class ObjCLanguageRuntime : public LanguageRuntime {
 public:
   enum class ObjCRuntimeVersions {

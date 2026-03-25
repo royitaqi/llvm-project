@@ -11,6 +11,10 @@
 
 #include "Plugins/ABI/X86/ABIX86_64.h"
 
+/// ABI plugin for the SysV x86-64 calling convention.
+///
+/// Implements the standard System V ABI for 64-bit x86 processors
+/// on Linux and other Unix-like systems.
 class ABISysV_x86_64 : public ABIX86_64 {
 public:
   ~ABISysV_x86_64() override = default;

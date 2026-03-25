@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Instrumentation runtime plugin for ThreadSanitizer (TSan) data race detection.
 class InstrumentationRuntimeTSan : public lldb_private::InstrumentationRuntime {
 public:
   ~InstrumentationRuntimeTSan() override;

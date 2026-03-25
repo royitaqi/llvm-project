@@ -22,6 +22,7 @@
 #include "lldb/Utility/FileSpec.h"
 #include "lldb/Utility/UUID.h"
 
+/// Dynamic loader plugin for Darwin (macOS/iOS) kernel and kernel extensions (kexts).
 class DynamicLoaderDarwinKernel : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderDarwinKernel(lldb_private::Process *process,
@@ -122,6 +123,7 @@ protected:
   // module
   // later if the user explicitly adds it to the target.
 
+  /// Represents a single kernel extension or kernel binary image loaded in memory.
   class KextImageInfo {
   public:
     KextImageInfo() : m_name(), m_module_sp(), m_memory_module_sp(), m_uuid() {}
@@ -208,6 +210,7 @@ protected:
         false; // true if this is the kernel, false if this is a kext
   };
 
+  /// Header structure describing the list of loaded kernel extensions in memory.
   struct OSKextLoadedKextSummaryHeader {
     uint32_t version = 0;
     uint32_t entry_size = 0;

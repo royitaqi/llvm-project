@@ -63,6 +63,7 @@ class SymbolFileDWARFDwp;
 
 #define DIE_IS_BEING_PARSED ((lldb_private::Type *)1)
 
+/// SymbolFile plugin that reads debug info from DWARF sections.
 class SymbolFileDWARF : public SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

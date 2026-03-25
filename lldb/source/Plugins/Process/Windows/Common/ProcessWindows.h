@@ -21,6 +21,8 @@ namespace lldb_private {
 
 class HostProcess;
 
+/// Process plugin for debugging Windows processes, handling debug events
+/// and managing process control via the Windows debugging API.
 class ProcessWindows : public Process, public ProcessDebugger {
 public:
   // Static functions.

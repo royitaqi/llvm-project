@@ -40,6 +40,7 @@ namespace lldb_private {
 
 namespace npdb {
 
+/// SymbolFile plugin for reading debug info from native PDB files.
 class SymbolFileNativePDB : public SymbolFileCommon {
   friend class UdtRecordCompleter;
 

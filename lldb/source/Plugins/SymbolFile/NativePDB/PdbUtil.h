@@ -34,6 +34,7 @@ namespace npdb {
 
 class PdbIndex;
 
+/// Unified wrapper for CodeView class, struct, union, and enum records.
 struct CVTagRecord {
   enum Kind { Class, Struct, Union, Enum };
 
@@ -94,6 +95,7 @@ private:
   Kind m_kind;
 };
 
+/// Represents a segment:offset address pair in a PDB.
 struct SegmentOffset {
   SegmentOffset() = default;
   SegmentOffset(uint16_t s, uint32_t o) : segment(s), offset(o) {}
@@ -101,6 +103,7 @@ struct SegmentOffset {
   uint32_t offset = 0;
 };
 
+/// Extends SegmentOffset with a length field.
 struct SegmentOffsetLength {
   SegmentOffsetLength() = default;
   SegmentOffsetLength(uint16_t s, uint32_t o, uint32_t l)
@@ -109,6 +112,7 @@ struct SegmentOffsetLength {
   uint32_t length = 0;
 };
 
+/// Information extracted from a PDB variable symbol record.
 struct VariableInfo {
   llvm::StringRef name;
   llvm::codeview::TypeIndex type;

@@ -21,6 +21,8 @@
 namespace lldb_private {
 namespace process_gdb_remote {
 
+/// Base class for GDB remote clients, managing asynchronous packet handling
+/// and synchronization between continue operations and interrupt requests.
 class GDBRemoteClientBase : public GDBRemoteCommunication, public Broadcaster {
 public:
   enum {

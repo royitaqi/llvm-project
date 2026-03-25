@@ -42,6 +42,7 @@ class ProcessLaunchInfo;
 class Stream;
 class Target;
 
+/// Base platform plugin for Darwin-based operating systems (macOS, iOS, etc.).
 class PlatformDarwin : public PlatformPOSIX {
 public:
   using PlatformPOSIX::PlatformPOSIX;

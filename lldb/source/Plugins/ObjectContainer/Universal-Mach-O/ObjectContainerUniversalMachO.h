@@ -13,6 +13,7 @@
 #include "lldb/Symbol/ObjectContainer.h"
 #include "lldb/Utility/FileSpec.h"
 
+/// ObjectContainer plugin for universal Mach-O (fat binary) files.
 class ObjectContainerUniversalMachO : public lldb_private::ObjectContainer {
 public:
   ObjectContainerUniversalMachO(const lldb::ModuleSP &module_sp,

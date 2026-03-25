@@ -18,6 +18,7 @@
 namespace lldb_private {
 class ArchSpec;
 
+/// Platform plugin for debugging remote watchOS devices.
 class PlatformRemoteAppleWatch : public PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteAppleWatch();

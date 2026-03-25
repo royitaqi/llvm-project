@@ -18,6 +18,10 @@
 #include "lldb/Utility/Flags.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV RISC-V calling convention.
+///
+/// Implements the System V ABI for RISC-V processors, supporting RV32, RV64,
+/// and optional extensions (compressed, embedded, floating-point).
 class ABISysV_riscv : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_riscv() override = default;

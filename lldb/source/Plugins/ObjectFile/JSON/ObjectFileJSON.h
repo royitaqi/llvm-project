@@ -15,6 +15,7 @@
 
 namespace lldb_private {
 
+/// ObjectFile plugin for reading JSON-encoded object files.
 class ObjectFileJSON : public ObjectFile {
 public:
   static void Initialize();

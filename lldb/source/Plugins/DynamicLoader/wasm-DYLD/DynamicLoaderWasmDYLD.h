@@ -14,6 +14,7 @@
 namespace lldb_private {
 namespace wasm {
 
+/// Dynamic loader plugin for WebAssembly modules.
 class DynamicLoaderWasmDYLD : public DynamicLoader {
 public:
   DynamicLoaderWasmDYLD(Process *process);

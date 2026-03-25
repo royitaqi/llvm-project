@@ -21,6 +21,9 @@ class TagDecl;
 }
 
 namespace lldb_private {
+/// Utility functions for working with Clang types and declarations.
+/// Provides helpers for extracting Clang-specific information from
+/// LLDB's CompilerType and CompilerDecl abstractions.
 struct ClangUtil {
   static bool IsClangType(const CompilerType &ct);
 

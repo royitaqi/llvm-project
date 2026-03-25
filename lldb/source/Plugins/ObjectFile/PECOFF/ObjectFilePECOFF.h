@@ -16,6 +16,7 @@
 #include "lldb/Symbol/SaveCoreOptions.h"
 #include "llvm/Object/COFF.h"
 
+/// ObjectFile plugin for reading PE/COFF (Portable Executable) binaries.
 class ObjectFilePECOFF : public lldb_private::ObjectFile {
 public:
   enum MachineType {

@@ -23,6 +23,7 @@ namespace dwarf {
 class DWARFDeclContext;
 class DWARFDIE;
 
+/// Abstract interface for DWARF debug info accelerator tables.
 class DWARFIndex {
 public:
   DWARFIndex(Module &module) : m_module(module) {}

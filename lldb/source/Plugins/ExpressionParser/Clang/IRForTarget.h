@@ -355,6 +355,8 @@ private:
 
   lldb_private::ExecutionPolicy m_policy;
 
+  /// Caches LLVM values created for functions during IR transformation.
+  /// Ensures values are computed once and reused across multiple references.
   class FunctionValueCache {
   public:
     typedef std::function<llvm::Value *(llvm::Function *)> Maker;

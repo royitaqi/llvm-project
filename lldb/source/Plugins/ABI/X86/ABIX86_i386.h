@@ -11,6 +11,10 @@
 
 #include "Plugins/ABI/X86/ABIX86.h"
 
+/// Base ABI plugin for i386 (32-bit x86) architectures.
+///
+/// Provides common functionality for 32-bit x86 calling conventions,
+/// serving as a base for platform-specific i386 ABI implementations.
 class ABIX86_i386 : public ABIX86 {
 public:
   uint32_t GetGenericNum(llvm::StringRef name) override;

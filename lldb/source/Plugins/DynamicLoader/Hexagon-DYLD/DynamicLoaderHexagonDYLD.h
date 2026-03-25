@@ -14,6 +14,7 @@
 
 #include "HexagonDYLDRendezvous.h"
 
+/// Dynamic loader plugin for Hexagon DSP architecture using POSIX-style dynamic linker.
 class DynamicLoaderHexagonDYLD : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderHexagonDYLD(lldb_private::Process *process);

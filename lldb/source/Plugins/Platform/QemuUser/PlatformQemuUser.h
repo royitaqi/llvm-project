@@ -15,6 +15,7 @@
 
 namespace lldb_private {
 
+/// Platform plugin for debugging processes running under QEMU user-mode emulation.
 class PlatformQemuUser : public Platform {
 public:
   static void Initialize();

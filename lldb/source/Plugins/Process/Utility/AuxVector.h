@@ -14,6 +14,8 @@
 #include <optional>
 #include <unordered_map>
 
+/// Parser for ELF auxiliary vector (auxv), providing access to process
+/// startup information passed by the kernel on ELF-based systems.
 class AuxVector {
 
 public:

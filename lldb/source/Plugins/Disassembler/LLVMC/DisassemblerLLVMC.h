@@ -20,6 +20,7 @@
 
 class InstructionLLVMC;
 
+/// Disassembler plugin using LLVM's MC disassembler framework.
 class DisassemblerLLVMC : public lldb_private::Disassembler {
 public:
   DisassemblerLLVMC(const lldb_private::ArchSpec &arch, const char *flavor,

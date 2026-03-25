@@ -24,6 +24,7 @@ class FileSpec;
 
 namespace platform_android {
 
+/// Client for communicating with the Android Debug Bridge (adb) daemon.
 class AdbClient {
 public:
   enum UnixSocketNamespace {
@@ -80,6 +81,7 @@ private:
   std::unique_ptr<Connection> m_conn;
 };
 
+/// Service for synchronizing files with Android devices via adb sync protocol.
 class AdbSyncService {
 public:
   explicit AdbSyncService(const std::string device_id);

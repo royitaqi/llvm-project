@@ -27,6 +27,8 @@
 
 class ThreadKDP;
 
+/// Process plugin for kernel debugging via the KDP (Kernel Debugging Protocol),
+/// used to debug macOS and iOS kernels over a network connection.
 class ProcessKDP : public lldb_private::Process {
 public:
   // Constructors and Destructors

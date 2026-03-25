@@ -32,6 +32,8 @@ class GDBRemoteDynamicRegisterInfo;
 typedef std::shared_ptr<GDBRemoteDynamicRegisterInfo>
     GDBRemoteDynamicRegisterInfoSP;
 
+/// Extended register information for GDB remote debugging, supporting
+/// dynamic updates for ARM64 SVE and SME register sets.
 class GDBRemoteDynamicRegisterInfo final : public DynamicRegisterInfo {
 public:
   GDBRemoteDynamicRegisterInfo() : DynamicRegisterInfo() {}
@@ -42,6 +44,8 @@ public:
   void UpdateARM64SMERegistersInfos(uint64_t svg);
 };
 
+/// Register context for threads in a GDB remote debugging session,
+/// managing register reads/writes through the remote protocol.
 class GDBRemoteRegisterContext : public RegisterContext {
 public:
   GDBRemoteRegisterContext(ThreadGDBRemote &thread, uint32_t concrete_frame_idx,

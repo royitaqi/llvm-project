@@ -26,6 +26,8 @@ namespace lldb_private {
 
 namespace minidump {
 
+/// Process plugin for debugging Windows Minidump crash files, providing
+/// access to thread contexts, memory regions, and module information.
 class ProcessMinidump : public PostMortemProcess {
 public:
   static lldb::ProcessSP CreateInstance(lldb::TargetSP target_sp,

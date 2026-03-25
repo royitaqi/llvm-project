@@ -64,6 +64,8 @@ class TypeSystemClang;
 /// declaration can be found and used as the source of any missing information.
 class ClangASTImporter {
 public:
+  /// Layout information for a RecordDecl used during code generation.
+  /// Stores size, alignment, and field/base offsets for records.
   struct LayoutInfo {
     LayoutInfo() = default;
     typedef llvm::DenseMap<const clang::CXXRecordDecl *, clang::CharUnits>
@@ -212,6 +214,8 @@ public:
   // Completers for maps
   //
 
+  /// Interface for completing namespace maps on demand.
+  /// Allows lazy population of namespace mappings when needed during name lookup.
   class MapCompleter {
   public:
     virtual ~MapCompleter();
@@ -239,6 +243,9 @@ public:
   void ForgetDestination(clang::ASTContext *dst_ctx);
   void ForgetSource(clang::ASTContext *dst_ctx, clang::ASTContext *src_ctx);
 
+  /// Tracks the origin of an imported declaration.
+  /// Records which ASTContext and Decl an imported declaration came from
+  /// to enable completion and updates of shallow-copied declarations.
   struct DeclOrigin {
     DeclOrigin() = default;
 
@@ -367,6 +374,9 @@ public:
   typedef llvm::DenseMap<const clang::NamespaceDecl *, NamespaceMapSP>
       NamespaceMetaMap;
 
+  /// Metadata associated with a destination ASTContext.
+  /// Tracks ASTImporter delegates, namespace maps, and declaration origins
+  /// for all imports into this context.
   class ASTContextMetadata {
     typedef llvm::DenseMap<const clang::Decl *, DeclOrigin> OriginMap;
 

@@ -19,6 +19,8 @@
 #include "lldb/Utility/StreamBuffer.h"
 #include "lldb/lldb-private.h"
 
+/// Communication handler for the KDP (Kernel Debugging Protocol), managing
+/// packet transmission and reception for kernel debugging sessions.
 class CommunicationKDP : public lldb_private::Communication {
 public:
   const static uint32_t kMaxPacketSize = 1200;

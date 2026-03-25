@@ -11,6 +11,10 @@
 
 #include "Plugins/ABI/X86/ABIX86.h"
 
+/// Base ABI plugin for x86-64 architectures.
+///
+/// Provides common functionality for 64-bit x86 calling conventions,
+/// serving as a base for platform-specific x86-64 ABI implementations.
 class ABIX86_64 : public ABIX86 {
 protected:
   std::string GetMCName(std::string name) override {

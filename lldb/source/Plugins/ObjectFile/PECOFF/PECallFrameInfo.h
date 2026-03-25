@@ -24,6 +24,7 @@ struct RuntimeFunction;
 }
 } // namespace llvm
 
+/// Call frame info provider for PE/COFF binaries using exception data.
 class PECallFrameInfo : public virtual lldb_private::CallFrameInfo {
 public:
   explicit PECallFrameInfo(ObjectFilePECOFF &object_file,

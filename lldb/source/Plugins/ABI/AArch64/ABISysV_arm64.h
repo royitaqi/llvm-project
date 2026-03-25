@@ -12,6 +12,10 @@
 #include "Plugins/ABI/AArch64/ABIAArch64.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV arm64 calling convention.
+///
+/// Implements the standard System V ABI for AArch64 used on Linux
+/// and other Unix-like systems.
 class ABISysV_arm64 : public ABIAArch64 {
 public:
   ~ABISysV_arm64() override = default;

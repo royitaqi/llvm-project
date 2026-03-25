@@ -15,6 +15,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// SymbolFile plugin for DWARF split debug info (.dwo) files.
 class SymbolFileDWARFDwo : public SymbolFileDWARF {
   /// LLVM RTTI support.
   static char ID;

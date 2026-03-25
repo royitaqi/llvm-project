@@ -26,6 +26,7 @@ class RemoteNXMapTable;
 
 namespace lldb_private {
 
+/// Language runtime plugin for Apple's Objective-C runtime version 2.
 class AppleObjCRuntimeV2 : public AppleObjCRuntime {
 public:
   ~AppleObjCRuntimeV2() override = default;

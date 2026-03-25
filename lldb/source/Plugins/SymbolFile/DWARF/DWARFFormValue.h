@@ -19,6 +19,7 @@ class DWARFUnit;
 class SymbolFileDWARF;
 class DWARFDIE;
 
+/// Encapsulates a DWARF attribute value and provides utilities for extraction.
 class DWARFFormValue {
 public:
   typedef llvm::DWARFFormValue::ValueType ValueType;

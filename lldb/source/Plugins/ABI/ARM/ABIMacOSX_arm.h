@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the macOS ARM calling convention.
+///
+/// Handles argument passing and register usage for 32-bit ARM on Apple platforms,
+/// including support for armv7k (watchOS) and standard ARM variants.
 class ABIMacOSX_arm : public lldb_private::RegInfoBasedABI {
 public:
   ~ABIMacOSX_arm() override = default;

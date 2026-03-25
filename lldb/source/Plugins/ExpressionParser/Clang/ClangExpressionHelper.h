@@ -25,7 +25,9 @@ namespace lldb_private {
 
 class ClangExpressionDeclMap;
 
-// ClangExpressionHelper
+/// Base class for Clang expression helpers.
+/// Provides access to the declaration map and AST transformers needed during
+/// expression parsing and compilation.
 class ClangExpressionHelper
     : public llvm::RTTIExtends<ClangExpressionHelper,
                                ExpressionTypeSystemHelper> {

@@ -11,6 +11,10 @@
 
 #include "lldb/Target/ABI.h"
 
+/// Base ABI plugin for AArch64 architectures.
+///
+/// Provides common functionality for AArch64 calling conventions including
+/// register mapping, address fixup, and unwind plan creation.
 class ABIAArch64 : public lldb_private::MCBasedABI {
 public:
   static void Initialize();

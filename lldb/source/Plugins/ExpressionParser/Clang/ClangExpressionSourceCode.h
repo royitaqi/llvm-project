@@ -21,6 +21,9 @@ namespace lldb_private {
 
 class ExecutionContext;
 
+/// Generates and manages source code for Clang expressions.
+/// Wraps user expressions with necessary boilerplate code and tracks the
+/// boundaries of user code for error reporting and fix-it hints.
 class ClangExpressionSourceCode : public ExpressionSourceCode {
 public:
   /// The file name we use for the wrapper code that we inject before

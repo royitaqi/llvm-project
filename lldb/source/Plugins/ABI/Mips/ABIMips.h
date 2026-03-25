@@ -9,6 +9,9 @@
 #ifndef LLDB_SOURCE_PLUGINS_ABI_MIPS_ABIMIPS_H
 #define LLDB_SOURCE_PLUGINS_ABI_MIPS_ABIMIPS_H
 
+/// Utility class for MIPS ABI plugin initialization.
+///
+/// Provides static methods to initialize and terminate all MIPS ABI plugins.
 class ABIMips {
 public:
   static void Initialize();

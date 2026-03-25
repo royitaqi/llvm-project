@@ -45,6 +45,8 @@ namespace process_gdb_remote {
 
 class ThreadGDBRemote;
 
+/// Process plugin that communicates with a remote GDB server via the
+/// GDB Remote Serial Protocol (RSP).
 class ProcessGDBRemote : public Process,
                          private GDBRemoteClientBase::ContinueDelegate {
 public:

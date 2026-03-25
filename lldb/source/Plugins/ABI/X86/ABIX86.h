@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// Base ABI plugin for x86 architectures.
+///
+/// Provides common functionality for x86 calling conventions including
+/// register augmentation and shared utilities for both 32-bit and 64-bit variants.
 class ABIX86 : public lldb_private::MCBasedABI {
 public:
   static void Initialize();

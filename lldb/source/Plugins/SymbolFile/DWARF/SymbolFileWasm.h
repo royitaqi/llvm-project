@@ -13,6 +13,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// SymbolFile plugin for WebAssembly modules with DWARF debug info.
 class SymbolFileWasm : public SymbolFileDWARF {
 public:
   SymbolFileWasm(lldb::ObjectFileSP objfile_sp, SectionList *dwo_section_list);

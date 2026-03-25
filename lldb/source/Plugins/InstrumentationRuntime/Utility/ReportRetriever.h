@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Utility class for retrieving sanitizer runtime reports at breakpoints.
 class ReportRetriever {
 private:
   static StructuredData::ObjectSP

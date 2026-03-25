@@ -27,6 +27,7 @@
 namespace lldb_private {
 namespace npdb {
 
+/// Discriminator for different types of PDB symbol identifiers.
 enum class PdbSymUidKind : uint8_t {
   Compiland,
   CompilandSym,
@@ -36,11 +37,13 @@ enum class PdbSymUidKind : uint8_t {
   FieldListMember
 };
 
+/// Identifies a PDB compiland by its module index.
 struct PdbCompilandId {
   // 0-based index of module in PDB
   uint16_t modi;
 };
 
+/// Identifies a symbol within a PDB compiland.
 struct PdbCompilandSymId {
   PdbCompilandSymId() = default;
   PdbCompilandSymId(uint16_t modi, uint32_t offset)
@@ -54,6 +57,7 @@ struct PdbCompilandSymId {
   uint32_t offset = 0;
 };
 
+/// Identifies a global or public symbol in the PDB.
 struct PdbGlobalSymId {
   PdbGlobalSymId() = default;
   PdbGlobalSymId(uint32_t offset, bool is_public)
@@ -67,6 +71,7 @@ struct PdbGlobalSymId {
   bool is_public = false;
 };
 
+/// Identifies a type in the PDB TPI or IPI stream.
 struct PdbTypeSymId {
   PdbTypeSymId() = default;
   PdbTypeSymId(llvm::codeview::TypeIndex index, bool is_ipi = false)
@@ -80,6 +85,7 @@ struct PdbTypeSymId {
   bool is_ipi = false;
 };
 
+/// Identifies a member within a field list record.
 struct PdbFieldListMemberId {
   // The TypeIndex of the LF_FIELDLIST record.
   llvm::codeview::TypeIndex index;
@@ -88,6 +94,7 @@ struct PdbFieldListMemberId {
   uint16_t offset = 0;
 };
 
+/// Type-safe wrapper for PDB symbol unique identifiers.
 class PdbSymUid {
   uint64_t m_repr = 0;
 
@@ -115,6 +122,7 @@ template <typename T> uint64_t toOpaqueUid(const T &cid) {
   return PdbSymUid(cid).toOpaqueId();
 }
 
+/// Pairs a CodeView symbol record with its PDB unique identifier.
 struct SymbolAndUid {
   llvm::codeview::CVSymbol sym;
   PdbSymUid uid;

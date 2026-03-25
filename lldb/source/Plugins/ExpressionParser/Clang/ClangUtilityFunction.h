@@ -72,6 +72,8 @@ public:
                ExecutionContext &exe_ctx) override;
 
 private:
+  /// Expression helper for ClangUtilityFunction that manages the declaration map
+  /// for utility functions (no AST transformers needed).
   class ClangUtilityFunctionHelper
       : public llvm::RTTIExtends<ClangUtilityFunctionHelper,
                                  ClangExpressionHelper> {

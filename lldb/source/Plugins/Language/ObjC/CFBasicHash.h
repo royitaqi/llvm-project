@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Helper for reading CoreFoundation CFBasicHash structures.
 class CFBasicHash {
 public:
   enum class HashType { set = 0, dict };

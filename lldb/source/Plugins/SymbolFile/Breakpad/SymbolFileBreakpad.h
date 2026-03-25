@@ -21,6 +21,7 @@ namespace lldb_private {
 
 namespace breakpad {
 
+/// SymbolFile plugin that reads debug info from Breakpad symbol files.
 class SymbolFileBreakpad : public SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

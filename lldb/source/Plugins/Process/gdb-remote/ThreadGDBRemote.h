@@ -25,6 +25,8 @@ namespace process_gdb_remote {
 
 class ProcessGDBRemote;
 
+/// Thread representation for GDB remote debugging, handling thread-specific
+/// state and queue information for processes controlled via RSP.
 class ThreadGDBRemote : public Thread {
 public:
   ThreadGDBRemote(Process &process, lldb::tid_t tid);

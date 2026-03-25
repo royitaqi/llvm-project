@@ -14,6 +14,9 @@
 #include "llvm/Support/FileCollector.h"
 
 namespace lldb_private {
+/// Adapts Clang's ModuleDependencyCollector to use LLDB's file collection.
+/// Bridges Clang's module dependency tracking with LLDB's file collector
+/// infrastructure for reproducers.
 class ModuleDependencyCollectorAdaptor
     : public clang::ModuleDependencyCollector {
 public:

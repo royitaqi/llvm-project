@@ -19,6 +19,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Tracks unique AST types created from DWARF to avoid duplicates.
 class UniqueDWARFASTType {
 public:
   // Constructors and Destructors
@@ -54,6 +55,7 @@ public:
   bool m_is_forward_declaration = true;
 };
 
+/// Collection of UniqueDWARFASTType entries for efficient lookup.
 class UniqueDWARFASTTypeList {
 public:
   UniqueDWARFASTTypeList() : m_collection() {}
@@ -75,6 +77,7 @@ protected:
   collection m_collection;
 };
 
+/// Maps type names to UniqueDWARFASTTypeList for deduplication.
 class UniqueDWARFASTTypeMap {
 public:
   UniqueDWARFASTTypeMap() : m_collection() {}

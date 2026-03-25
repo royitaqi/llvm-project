@@ -25,6 +25,8 @@ class ScriptedFrame;
 
 namespace lldb_private {
 
+/// Thread representation for scripted processes, providing thread state
+/// and stack frame information via a Python script interface.
 class ScriptedThread : public lldb_private::Thread {
 
 public:

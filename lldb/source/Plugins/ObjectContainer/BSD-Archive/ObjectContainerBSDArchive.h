@@ -27,6 +27,7 @@
 
 enum class ArchiveType { Invalid, Archive, ThinArchive };
 
+/// ObjectContainer plugin for BSD archive (.a) files.
 class ObjectContainerBSDArchive : public lldb_private::ObjectContainer {
 public:
   ObjectContainerBSDArchive(const lldb::ModuleSP &module_sp,

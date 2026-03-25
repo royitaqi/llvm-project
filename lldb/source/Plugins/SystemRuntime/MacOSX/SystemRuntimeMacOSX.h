@@ -28,6 +28,8 @@
 #include "AppleGetQueuesHandler.h"
 #include "AppleGetThreadItemInfoHandler.h"
 
+/// System runtime for macOS/iOS, providing libdispatch queue introspection
+/// and extended backtraces for Grand Central Dispatch (GCD) applications.
 class SystemRuntimeMacOSX : public lldb_private::SystemRuntime {
 public:
   SystemRuntimeMacOSX(lldb_private::Process *process);

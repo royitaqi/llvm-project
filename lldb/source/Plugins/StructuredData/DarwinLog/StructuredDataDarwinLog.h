@@ -20,6 +20,8 @@ class EnableCommand;
 
 namespace lldb_private {
 
+/// Structured data plugin for macOS/iOS unified logging (os_log), capturing
+/// and displaying log messages from debugged processes.
 class StructuredDataDarwinLog : public StructuredDataPlugin {
   friend sddarwinlog_private::EnableCommand;
 

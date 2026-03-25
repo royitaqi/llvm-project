@@ -16,6 +16,7 @@
 #include "lldb/Symbol/SymbolFile.h"
 #include "lldb/Symbol/Symtab.h"
 
+/// SymbolFile plugin that creates compile units from object file symbol tables.
 class SymbolFileSymtab : public lldb_private::SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

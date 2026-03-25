@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Platform plugin for debugging on Windows hosts and remote Windows targets.
 class PlatformWindows : public RemoteAwarePlatform {
 public:
   PlatformWindows(bool is_host);

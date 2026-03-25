@@ -20,6 +20,7 @@
 
 namespace lldb_private {
 
+/// Thread plan for stepping through Objective-C message dispatch trampolines.
 class AppleThreadPlanStepThroughObjCTrampoline : public ThreadPlan {
 public:
   AppleThreadPlanStepThroughObjCTrampoline(
@@ -80,6 +81,7 @@ private:
                                /// m_sel_str_addr is non-null.
 };
 
+/// Thread plan for stepping through Objective-C direct dispatch functions.
 class AppleThreadPlanStepThroughDirectDispatch: public ThreadPlanStepOut {
 public:
   AppleThreadPlanStepThroughDirectDispatch(Thread &thread,

@@ -24,6 +24,7 @@ namespace lldb_private::plugin {
 namespace dwarf {
 class SymbolFileDWARF;
 
+/// Represents the header of a DWARF debug macro section.
 class DWARFDebugMacroHeader {
 public:
   enum HeaderFlagMask {
@@ -47,6 +48,7 @@ private:
   uint64_t m_debug_line_offset = 0;
 };
 
+/// Provides utilities for parsing DWARF debug macro entries.
 class DWARFDebugMacroEntry {
 public:
   static void ReadMacroEntries(const DWARFDataExtractor &debug_macro_data,

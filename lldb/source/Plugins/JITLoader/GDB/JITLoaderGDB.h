@@ -14,6 +14,7 @@
 #include "lldb/Target/JITLoader.h"
 #include "lldb/Target/Process.h"
 
+/// JIT loader plugin using the GDB JIT interface for loading JIT-compiled code.
 class JITLoaderGDB : public lldb_private::JITLoader {
 public:
   JITLoaderGDB(lldb_private::Process *process);

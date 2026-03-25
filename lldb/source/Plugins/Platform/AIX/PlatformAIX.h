@@ -14,6 +14,7 @@
 
 namespace lldb_private::platform_aix {
 
+/// Platform plugin for debugging on AIX hosts and remote AIX targets.
 class PlatformAIX : public PlatformPOSIX {
 public:
   PlatformAIX(bool is_host);

@@ -19,6 +19,7 @@
 #include "lldb/Utility/UUID.h"
 #include "llvm/BinaryFormat/ELF.h"
 
+/// Dynamic loader plugin for FreeBSD kernel and kernel modules.
 class DynamicLoaderFreeBSDKernel : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderFreeBSDKernel(lldb_private::Process *process,
@@ -56,6 +57,7 @@ public:
   llvm::StringRef GetPluginName() override { return GetPluginNameStatic(); }
 
 protected:
+  /// Represents a single kernel module loaded in the FreeBSD kernel.
   class KModImageInfo {
   public:
     KModImageInfo()

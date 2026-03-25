@@ -19,6 +19,7 @@
 
 namespace lldb_private {
 
+/// Class descriptor for Objective-C runtime v2 classes.
 class ClassDescriptorV2 : public ObjCLanguageRuntime::ClassDescriptor {
 public:
   friend class lldb_private::AppleObjCRuntimeV2;
@@ -284,7 +285,7 @@ private:
   mutable std::optional<uint64_t> m_last_version_updated;
 };
 
-// tagged pointer descriptor
+/// Class descriptor for tagged pointer objects in Objective-C runtime v2.
 class ClassDescriptorV2Tagged : public ObjCLanguageRuntime::ClassDescriptor {
 public:
   ClassDescriptorV2Tagged(ConstString class_name, uint64_t payload) {

@@ -19,6 +19,12 @@
 namespace lldb_private {
 namespace breakpad {
 
+/// Base class for Google Breakpad symbol file records.
+///
+/// Breakpad symbol files are text-based debug info files used by the Breakpad
+/// crash reporting system. Each line begins with a keyword identifying the
+/// record type (MODULE, FILE, FUNC, etc.). This class hierarchy provides
+/// parsers and typed representations for each record kind.
 class Record {
 public:
   enum Kind {
@@ -57,6 +63,7 @@ inline llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, Record::Kind K) {
   return OS;
 }
 
+/// A MODULE record identifying the binary (OS, architecture, and build ID).
 class ModuleRecord : public Record {
 public:
   static std::optional<ModuleRecord> parse(llvm::StringRef Line);
@@ -73,6 +80,7 @@ inline bool operator==(const ModuleRecord &L, const ModuleRecord &R) {
 }
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const ModuleRecord &R);
 
+/// An INFO record providing supplemental module metadata (e.g. code ID).
 class InfoRecord : public Record {
 public:
   static std::optional<InfoRecord> parse(llvm::StringRef Line);
@@ -86,6 +94,7 @@ inline bool operator==(const InfoRecord &L, const InfoRecord &R) {
 }
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const InfoRecord &R);
 
+/// A FILE record mapping a file number to a source file path.
 class FileRecord : public Record {
 public:
   static std::optional<FileRecord> parse(llvm::StringRef Line);
@@ -101,6 +110,8 @@ inline bool operator==(const FileRecord &L, const FileRecord &R) {
 }
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const FileRecord &R);
 
+/// An INLINE_ORIGIN record mapping an origin number to an inlined function
+/// name.
 class InlineOriginRecord : public Record {
 public:
   static std::optional<InlineOriginRecord> parse(llvm::StringRef Line);
@@ -118,6 +129,8 @@ inline bool operator==(const InlineOriginRecord &L,
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS,
                               const InlineOriginRecord &R);
 
+/// A FUNC record describing a function's address range, parameter size, and
+/// name.
 class FuncRecord : public Record {
 public:
   static std::optional<FuncRecord> parse(llvm::StringRef Line);
@@ -136,6 +149,8 @@ public:
 bool operator==(const FuncRecord &L, const FuncRecord &R);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const FuncRecord &R);
 
+/// An INLINE record describing an inlined function call site with nesting
+/// level, call site location, and address ranges.
 class InlineRecord : public Record {
 public:
   static std::optional<InlineRecord> parse(llvm::StringRef Line);
@@ -156,6 +171,7 @@ public:
 bool operator==(const InlineRecord &L, const InlineRecord &R);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const InlineRecord &R);
 
+/// A line record mapping an address range to a source line and file number.
 class LineRecord : public Record {
 public:
   static std::optional<LineRecord> parse(llvm::StringRef Line);
@@ -173,6 +189,8 @@ public:
 bool operator==(const LineRecord &L, const LineRecord &R);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const LineRecord &R);
 
+/// A PUBLIC record describing a publicly visible symbol with address and
+/// parameter size.
 class PublicRecord : public Record {
 public:
   static std::optional<PublicRecord> parse(llvm::StringRef Line);
@@ -190,6 +208,8 @@ public:
 bool operator==(const PublicRecord &L, const PublicRecord &R);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const PublicRecord &R);
 
+/// A STACK CFI record describing Call Frame Information (DWARF-style) unwind
+/// rules at a given address.
 class StackCFIRecord : public Record {
 public:
   static std::optional<StackCFIRecord> parse(llvm::StringRef Line);
@@ -206,6 +226,8 @@ public:
 bool operator==(const StackCFIRecord &L, const StackCFIRecord &R);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const StackCFIRecord &R);
 
+/// A STACK WIN record describing Windows-style (FPO/FrameData) unwind
+/// information for a code range.
 class StackWinRecord : public Record {
 public:
   static std::optional<StackWinRecord> parse(llvm::StringRef Line);

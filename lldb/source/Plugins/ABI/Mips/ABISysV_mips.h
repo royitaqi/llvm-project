@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV MIPS calling convention.
+///
+/// Implements the System V ABI for 32-bit MIPS processors,
+/// supporting both hard-float and soft-float calling conventions.
 class ABISysV_mips : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_mips() override = default;

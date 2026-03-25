@@ -15,6 +15,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Represents and provides access to DWARF address range information.
 class DWARFDebugAranges {
 protected:
   typedef RangeDataVector<dw_addr_t, uint32_t, dw_offset_t> RangeToDIE;

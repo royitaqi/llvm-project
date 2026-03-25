@@ -66,6 +66,8 @@ class PythonDictionary;
 class PythonInteger;
 class PythonException;
 
+/// RAII helper to acquire and release the Python Global Interpreter Lock (GIL),
+/// ensuring thread-safe access to Python objects.
 class GIL {
 public:
   GIL() {

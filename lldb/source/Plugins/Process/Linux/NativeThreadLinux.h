@@ -26,6 +26,8 @@ namespace process_linux {
 
 class NativeProcessLinux;
 
+/// Native thread implementation for Linux, managing thread state, hardware
+/// breakpoints/watchpoints, and ptrace-based control on Linux systems.
 class NativeThreadLinux : public NativeThreadProtocol {
   friend class NativeProcessLinux;
 

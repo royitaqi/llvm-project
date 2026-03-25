@@ -18,6 +18,8 @@ namespace lldb_private {
 
 namespace minidump {
 
+/// Thread representation for Minidump debugging, providing access to
+/// saved register state from the crash dump.
 class ThreadMinidump : public Thread {
 public:
   ThreadMinidump(Process &process, const minidump::Thread &td,

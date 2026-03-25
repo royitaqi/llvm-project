@@ -17,6 +17,7 @@
 
 namespace lldb_private::plugin::dwarf {
 
+/// Container for all manual DWARF index tables by category.
 template <typename T> struct IndexSet {
   T function_basenames;
   T function_fullnames;

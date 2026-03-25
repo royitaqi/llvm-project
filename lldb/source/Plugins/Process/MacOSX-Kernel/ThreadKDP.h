@@ -16,6 +16,8 @@
 
 class ProcessKDP;
 
+/// Thread representation for KDP (Kernel Debugging Protocol) sessions,
+/// managing thread state for kernel debugging over network connections.
 class ThreadKDP : public lldb_private::Thread {
 public:
   ThreadKDP(lldb_private::Process &process, lldb::tid_t tid);

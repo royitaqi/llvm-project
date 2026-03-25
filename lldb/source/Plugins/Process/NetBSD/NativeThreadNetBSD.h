@@ -22,6 +22,8 @@ namespace process_netbsd {
 
 class NativeProcessNetBSD;
 
+/// Native thread implementation for NetBSD, managing thread state and
+/// hardware debug features via ptrace on NetBSD systems.
 class NativeThreadNetBSD : public NativeThreadProtocol {
   friend class NativeProcessNetBSD;
 

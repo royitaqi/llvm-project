@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Language runtime plugin for Apple's Objective-C runtime version 1.
 class AppleObjCRuntimeV1 : public AppleObjCRuntime {
 public:
   ~AppleObjCRuntimeV1() override = default;

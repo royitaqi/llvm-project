@@ -18,6 +18,8 @@
 
 class ThreadKDP;
 
+/// Process plugin for debugging Mach-O core dump files on macOS and iOS,
+/// extracting thread state and memory from LC_THREAD and segment commands.
 class ProcessMachCore : public lldb_private::PostMortemProcess {
 public:
   // Constructors and Destructors

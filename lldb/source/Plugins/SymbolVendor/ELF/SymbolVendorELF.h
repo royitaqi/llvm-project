@@ -12,6 +12,8 @@
 #include "lldb/Symbol/SymbolVendor.h"
 #include "lldb/lldb-private.h"
 
+/// Symbol vendor for ELF object files, locating and loading debug information
+/// from separate .debug files and build-id based symbol files.
 class SymbolVendorELF : public lldb_private::SymbolVendor {
 public:
   // Constructors and Destructors

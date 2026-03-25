@@ -255,6 +255,8 @@ public:
   lldb::addr_t GetSymbolAddress(ConstString name,
                                 lldb::SymbolType symbol_type);
 
+  /// Basic target configuration information needed during expression evaluation.
+  /// Caches byte order and address size for the target.
   struct TargetInfo {
     lldb::ByteOrder byte_order = lldb::eByteOrderInvalid;
     size_t address_byte_size = 0;

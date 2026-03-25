@@ -12,6 +12,7 @@
 #include "PlatformRemoteDarwinDevice.h"
 
 namespace lldb_private {
+/// Platform plugin for debugging remote xrOS devices.
 class PlatformRemoteAppleXR : public PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteAppleXR();

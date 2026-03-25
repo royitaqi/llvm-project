@@ -18,6 +18,10 @@
 #include "lldb/Utility/Flags.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV LoongArch calling convention.
+///
+/// Implements the System V ABI for LoongArch processors,
+/// supporting both LA32 and LA64 architectures.
 class ABISysV_loongarch : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_loongarch() override = default;

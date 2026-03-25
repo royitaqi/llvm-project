@@ -27,6 +27,7 @@ namespace dwarf {
 class DWARFDIE;
 class SymbolFileDWARF;
 
+/// Abstract parser for converting DWARF debug info into AST types and declarations.
 class DWARFASTParser {
 public:
   enum class Kind { DWARFASTParserClang };

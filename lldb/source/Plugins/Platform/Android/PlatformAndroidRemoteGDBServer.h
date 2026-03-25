@@ -21,6 +21,7 @@
 namespace lldb_private {
 namespace platform_android {
 
+/// Platform plugin for debugging Android targets via GDB remote protocol.
 class PlatformAndroidRemoteGDBServer
     : public platform_gdb_server::PlatformRemoteGDBServer {
 public:

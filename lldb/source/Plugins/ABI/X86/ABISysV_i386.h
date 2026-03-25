@@ -12,6 +12,10 @@
 #include "Plugins/ABI/X86/ABIX86_i386.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV i386 calling convention.
+///
+/// Implements the standard System V ABI for 32-bit x86 processors
+/// on Linux and other Unix-like systems.
 class ABISysV_i386 : public ABIX86_i386 {
 public:
   ~ABISysV_i386() override = default;

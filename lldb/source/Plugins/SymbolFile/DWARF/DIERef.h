@@ -17,6 +17,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Compact reference to a DWARF debug info entry across multiple files.
 /// Identifies a DWARF debug info entry within a given Module. It contains three
 /// "coordinates":
 /// - file_index: identifies the separate stand alone debug info file

@@ -20,6 +20,7 @@
 
 namespace lldb_private {
 
+/// Language runtime plugin for C++.
 class CPPLanguageRuntime : public LanguageRuntime {
 public:
   enum class LibCppStdFunctionCallableCase {

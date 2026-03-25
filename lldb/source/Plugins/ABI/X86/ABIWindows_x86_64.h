@@ -11,6 +11,10 @@
 
 #include "Plugins/ABI/X86/ABIX86_64.h"
 
+/// ABI plugin for the Windows x86-64 calling convention.
+///
+/// Implements the Microsoft x64 calling convention used on
+/// Windows systems for 64-bit x86 processors.
 class ABIWindows_x86_64 : public ABIX86_64 {
 public:
   ~ABIWindows_x86_64() override = default;

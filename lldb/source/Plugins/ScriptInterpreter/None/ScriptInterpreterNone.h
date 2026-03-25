@@ -13,6 +13,8 @@
 
 namespace lldb_private {
 
+/// Stub script interpreter for when no scripting language is available,
+/// providing minimal non-functional implementations of script interfaces.
 class ScriptInterpreterNone : public ScriptInterpreter {
 public:
   ScriptInterpreterNone(Debugger &debugger);

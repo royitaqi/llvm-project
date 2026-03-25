@@ -23,6 +23,9 @@ namespace lldb_private {
 class ExecutionContext;
 class Stream;
 
+/// Clang-specific implementation of dynamic checker functions.
+/// Provides runtime validation functions for Objective-C method calls
+/// to prevent crashes from invalid message sends.
 class ClangDynamicCheckerFunctions
     : public lldb_private::DynamicCheckerFunctions {
 public:

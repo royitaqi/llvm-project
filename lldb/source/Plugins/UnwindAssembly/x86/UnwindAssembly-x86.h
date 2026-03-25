@@ -14,6 +14,8 @@
 #include "lldb/Target/UnwindAssembly.h"
 #include "lldb/lldb-private.h"
 
+/// Unwind plan generator for x86/x86_64 architectures, analyzing assembly
+/// instructions to create accurate unwind information for stack unwinding.
 class UnwindAssembly_x86 : public lldb_private::UnwindAssembly {
 public:
   ~UnwindAssembly_x86() override;

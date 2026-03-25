@@ -18,7 +18,11 @@
 #include "lldb/lldb-enumerations.h"
 
 namespace lldb_private {
+
 class LuaState;
+
+/// Script interpreter for the Lua programming language, enabling Lua-based
+/// debugging scripts, breakpoint callbacks, and command extensions.
 class ScriptInterpreterLua : public ScriptInterpreter {
 public:
   class CommandDataLua : public BreakpointOptions::CommandData {

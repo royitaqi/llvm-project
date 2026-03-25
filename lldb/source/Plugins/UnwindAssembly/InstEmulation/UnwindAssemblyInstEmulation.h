@@ -15,6 +15,8 @@
 #include "lldb/Utility/RegisterValue.h"
 #include "lldb/lldb-private.h"
 
+/// Unwind plan generator using instruction emulation, creating unwind
+/// information by simulating function prologue and epilogue execution.
 class UnwindAssemblyInstEmulation : public lldb_private::UnwindAssembly {
 public:
   ~UnwindAssemblyInstEmulation() override = default;

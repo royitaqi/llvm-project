@@ -14,6 +14,12 @@
 
 namespace lldb_private {
 
+/// Base type for Compact C Type Format (CTF) type records.
+///
+/// CTF is a compact debugging format that stores type information alongside
+/// object files. This class hierarchy mirrors the CTF type system, using LLVM
+/// RTTI (classof) for safe downcasting. Each subclass corresponds to a CTF
+/// type kind (integer, pointer, struct, etc.).
 struct CTFType {
   enum Kind : uint32_t {
     eUnknown = 0,
@@ -41,6 +47,7 @@ struct CTFType {
       : kind(kind), uid(uid), name(name) {}
 };
 
+/// CTF integer type, representing fixed-width integer types with encoding info.
 struct CTFInteger : public CTFType {
   CTFInteger(lldb::user_id_t uid, llvm::StringRef name, uint32_t bits,
              uint32_t encoding)
@@ -52,6 +59,7 @@ struct CTFInteger : public CTFType {
   uint32_t encoding;
 };
 
+/// Base class for CTF type qualifiers (pointer, const, volatile, restrict).
 struct CTFModifier : public CTFType {
 protected:
   CTFModifier(Kind kind, lldb::user_id_t uid, uint32_t type)
@@ -66,6 +74,7 @@ public:
   uint32_t type;
 };
 
+/// CTF pointer type modifier.
 struct CTFPointer : public CTFModifier {
   CTFPointer(lldb::user_id_t uid, uint32_t type)
       : CTFModifier(ePointer, uid, type) {}
@@ -73,6 +82,7 @@ struct CTFPointer : public CTFModifier {
   static bool classof(const CTFType *T) { return T->kind == ePointer; }
 };
 
+/// CTF const type modifier.
 struct CTFConst : public CTFModifier {
   CTFConst(lldb::user_id_t uid, uint32_t type)
       : CTFModifier(eConst, uid, type) {}
@@ -80,6 +90,7 @@ struct CTFConst : public CTFModifier {
   static bool classof(const CTFType *T) { return T->kind == eConst; }
 };
 
+/// CTF volatile type modifier.
 struct CTFVolatile : public CTFModifier {
   CTFVolatile(lldb::user_id_t uid, uint32_t type)
       : CTFModifier(eVolatile, uid, type) {}
@@ -87,12 +98,14 @@ struct CTFVolatile : public CTFModifier {
   static bool classof(const CTFType *T) { return T->kind == eVolatile; }
 };
 
+/// CTF restrict type modifier.
 struct CTFRestrict : public CTFModifier {
   CTFRestrict(lldb::user_id_t uid, uint32_t type)
       : CTFModifier(eRestrict, uid, type) {}
   static bool classof(const CTFType *T) { return T->kind == eRestrict; }
 };
 
+/// CTF typedef, an alias for another type.
 struct CTFTypedef : public CTFType {
   CTFTypedef(lldb::user_id_t uid, llvm::StringRef name, uint32_t type)
       : CTFType(eTypedef, uid, name), type(type) {}
@@ -102,6 +115,7 @@ struct CTFTypedef : public CTFType {
   uint32_t type;
 };
 
+/// CTF array type with element type, index type, and element count.
 struct CTFArray : public CTFType {
   CTFArray(lldb::user_id_t uid, llvm::StringRef name, uint32_t type,
            uint32_t index, uint32_t nelems)
@@ -114,6 +128,7 @@ struct CTFArray : public CTFType {
   uint32_t nelems;
 };
 
+/// CTF enumeration type with named integer constants.
 struct CTFEnum : public CTFType {
   struct Value {
     Value(llvm::StringRef name, uint32_t value) : name(name), value(value){};
@@ -135,6 +150,7 @@ struct CTFEnum : public CTFType {
   std::vector<Value> values;
 };
 
+/// CTF function type with return type and parameter list.
 struct CTFFunction : public CTFType {
   CTFFunction(lldb::user_id_t uid, llvm::StringRef name, uint32_t nargs,
               uint32_t return_type, std::vector<uint32_t> args, bool variadic)
@@ -150,6 +166,8 @@ struct CTFFunction : public CTFType {
   bool variadic = false;
 };
 
+/// Base class for CTF struct and union types, containing named fields with
+/// type references and byte offsets.
 struct CTFRecord : public CTFType {
 public:
   struct Field {
@@ -175,6 +193,7 @@ public:
   std::vector<Field> fields;
 };
 
+/// CTF struct type (fields at specified offsets).
 struct CTFStruct : public CTFRecord {
   CTFStruct(lldb::user_id_t uid, llvm::StringRef name, uint32_t nfields,
             uint32_t size, std::vector<Field> fields)
@@ -183,6 +202,7 @@ struct CTFStruct : public CTFRecord {
   static bool classof(const CTFType *T) { return T->kind == eStruct; }
 };
 
+/// CTF union type (all fields at offset zero).
 struct CTFUnion : public CTFRecord {
   CTFUnion(lldb::user_id_t uid, llvm::StringRef name, uint32_t nfields,
            uint32_t size, std::vector<Field> fields)
@@ -191,6 +211,7 @@ struct CTFUnion : public CTFRecord {
   static bool classof(const CTFType *T) { return T->kind == eUnion; }
 };
 
+/// CTF forward declaration of a struct or union that may be defined elsewhere.
 struct CTFForward : public CTFType {
   CTFForward(lldb::user_id_t uid, llvm::StringRef name)
       : CTFType(eForward, uid, name) {}

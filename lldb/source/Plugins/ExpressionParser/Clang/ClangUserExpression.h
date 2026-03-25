@@ -51,6 +51,8 @@ public:
 
   enum { kDefaultTimeout = 500000u };
 
+  /// Expression helper for ClangUserExpression that manages the declaration map
+  /// and AST transformers (result synthesizer and struct extractor) for user expressions.
   class ClangUserExpressionHelper
       : public llvm::RTTIExtends<ClangUserExpressionHelper,
                                  ClangExpressionHelper> {
@@ -227,6 +229,8 @@ private:
 
   ClangUserExpressionHelper m_type_system_helper;
 
+  /// Delegate for managing the result variable of a user expression.
+  /// Handles naming and dematerialization of expression results.
   class ResultDelegate : public Materializer::PersistentVariableDelegate {
   public:
     ResultDelegate(lldb::TargetSP target) : m_target_sp(target) {}

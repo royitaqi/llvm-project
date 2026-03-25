@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Dynamic loader plugin for Windows PE executables and DLLs.
 class DynamicLoaderWindowsDYLD : public DynamicLoader {
 public:
   DynamicLoaderWindowsDYLD(Process *process);

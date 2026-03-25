@@ -15,6 +15,8 @@
 namespace lldb_private {
 namespace wasm {
 
+/// Symbol vendor for WebAssembly modules, loading debug information embedded
+/// in or external to Wasm binaries.
 class SymbolVendorWasm : public lldb_private::SymbolVendor {
 public:
   SymbolVendorWasm(const lldb::ModuleSP &module_sp);

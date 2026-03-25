@@ -15,6 +15,8 @@
 namespace lldb_private {
 namespace trace_intel_pt {
 
+/// Trace cursor for Intel Processor Trace, navigating through decoded
+/// instruction history with timing and event information.
 class TraceCursorIntelPT : public TraceCursor {
 public:
   TraceCursorIntelPT(

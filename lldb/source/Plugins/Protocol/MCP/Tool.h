@@ -17,6 +17,7 @@
 
 namespace lldb_private::mcp {
 
+/// MCP tool for executing LLDB commands via the Model Context Protocol.
 class CommandTool : public lldb_protocol::mcp::Tool {
 public:
   using lldb_protocol::mcp::Tool::Tool;
@@ -28,6 +29,7 @@ public:
   std::optional<llvm::json::Value> GetSchema() const override;
 };
 
+/// MCP tool for listing available LLDB debugger instances.
 class DebuggerListTool : public lldb_protocol::mcp::Tool {
 public:
   using lldb_protocol::mcp::Tool::Tool;

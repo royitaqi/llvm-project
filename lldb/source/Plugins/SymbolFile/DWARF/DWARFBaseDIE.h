@@ -26,6 +26,7 @@ class DWARFDeclContext;
 class SymbolFileDWARF;
 class DWARFFormValue;
 
+/// Base class for DWARF Debug Info Entry with basic read-only capabilities.
 class DWARFBaseDIE {
 public:
   using DWARFFormValue = dwarf::DWARFFormValue;

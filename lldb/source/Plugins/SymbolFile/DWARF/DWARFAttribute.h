@@ -18,6 +18,7 @@ namespace lldb_private::plugin {
 namespace dwarf {
 class DWARFUnit;
 
+/// Represents a single DWARF attribute (name, form, value triple).
 class DWARFAttribute {
 public:
   DWARFAttribute(dw_attr_t attr, dw_form_t form,
@@ -40,6 +41,7 @@ protected:
   DWARFFormValue::ValueType m_value;
 };
 
+/// Collection of DWARF attributes for a single DIE.
 class DWARFAttributes {
 public:
   DWARFAttributes();

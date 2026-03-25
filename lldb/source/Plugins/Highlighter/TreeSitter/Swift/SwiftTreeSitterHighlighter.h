@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Syntax highlighter for Swift using Tree-sitter.
 class SwiftTreeSitterHighlighter : public TreeSitterHighlighter {
 public:
   SwiftTreeSitterHighlighter() = default;

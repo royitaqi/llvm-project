@@ -20,6 +20,7 @@
 
 namespace lldb_private {
 
+/// Base class for Apple's Objective-C runtime support (v1 and v2).
 class AppleObjCRuntime : public lldb_private::ObjCLanguageRuntime {
 public:
   ~AppleObjCRuntime() override;

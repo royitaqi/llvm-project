@@ -14,6 +14,7 @@
 #include "lldb/Core/EmulateInstruction.h"
 #include "lldb/Core/Opcode.h"
 
+/// Holds pseudo-register and memory state for ARM instruction emulation testing.
 class EmulationStateARM {
 public:
   EmulationStateARM();

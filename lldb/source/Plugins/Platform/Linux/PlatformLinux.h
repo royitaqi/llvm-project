@@ -15,6 +15,7 @@
 namespace lldb_private {
 namespace platform_linux {
 
+/// Platform plugin for debugging on Linux hosts and remote Linux targets.
 class PlatformLinux : public PlatformPOSIX {
 public:
   PlatformLinux(bool is_host);

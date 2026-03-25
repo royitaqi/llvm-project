@@ -17,6 +17,7 @@
 
 namespace lldb_private {
 
+/// Syntax highlighter using Clang keyword matching for C-family languages.
 class ClangHighlighter : public Highlighter {
   llvm::StringSet<> keywords;
 

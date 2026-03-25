@@ -64,6 +64,8 @@ using FallibleMemory64Iterator =
 using ExceptionStreamsIterator =
     llvm::object::MinidumpFile::ExceptionStreamsIterator;
 
+/// Parser for Windows Minidump files, extracting thread contexts, memory
+/// ranges, module lists, and exception information from the dump.
 class MinidumpParser {
 public:
   static llvm::Expected<MinidumpParser>

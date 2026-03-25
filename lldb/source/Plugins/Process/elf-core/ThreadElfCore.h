@@ -131,6 +131,8 @@ struct ELFLinuxPrPsInfo {
 static_assert(sizeof(ELFLinuxPrPsInfo) == 136,
               "sizeof ELFLinuxPrPsInfo is not correct!");
 
+/// Thread representation for ELF core dump debugging, providing access
+/// to saved register state and thread-specific information from the core.
 class ThreadElfCore : public lldb_private::Thread {
 public:
   ThreadElfCore(lldb_private::Process &process, const ThreadData &td);

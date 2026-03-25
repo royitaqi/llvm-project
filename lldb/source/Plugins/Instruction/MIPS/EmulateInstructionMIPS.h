@@ -30,6 +30,7 @@ namespace lldb_private {
 #include "lldb/Utility/Status.h"
 #include <optional>
 
+/// Emulates MIPS32 instructions for unwinding and single-stepping.
 class EmulateInstructionMIPS : public lldb_private::EmulateInstruction {
 public:
   static void Initialize();

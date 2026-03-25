@@ -18,6 +18,7 @@
 
 namespace lldb_private {
 
+/// Handler for stepping through Objective-C message dispatch trampolines.
 class AppleObjCTrampolineHandler {
 public:
   AppleObjCTrampolineHandler(const lldb::ProcessSP &process_sp,

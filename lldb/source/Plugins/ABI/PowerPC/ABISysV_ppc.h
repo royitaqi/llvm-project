@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV PowerPC calling convention.
+///
+/// Implements the System V ABI for 32-bit PowerPC processors
+/// on Linux and other Unix-like systems.
 class ABISysV_ppc : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_ppc() override = default;

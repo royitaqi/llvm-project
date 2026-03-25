@@ -34,6 +34,7 @@ class Stream;
 #if defined(__APPLE__) // This Plugin uses the Mac-specific
                        // source/Host/macosx/cfcpp utilities
 
+/// Platform plugin for debugging Darwin kernel extensions (kexts) and kernels.
 class PlatformDarwinKernel : public PlatformDarwin {
 public:
   static lldb::PlatformSP CreateInstance(bool force, const ArchSpec *arch);

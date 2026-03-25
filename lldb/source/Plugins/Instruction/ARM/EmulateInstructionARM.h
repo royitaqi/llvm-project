@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Predicts single-step breakpoint locations for ARM instructions.
 class ARMSingleStepBreakpointLocationsPredictor
     : public SingleStepBreakpointLocationsPredictor {
 public:
@@ -26,7 +27,7 @@ public:
   llvm::Expected<unsigned> GetBreakpointSize(lldb::addr_t bp_addr) override;
 };
 
-// ITSession - Keep track of the IT Block progression.
+/// Tracks ARM IT (If-Then) block state for conditional instruction execution.
 class ITSession {
 public:
   ITSession() = default;
@@ -53,6 +54,7 @@ private:
   uint32_t ITState = 0;   // A2.5.2 Consists of IT[7:5] and IT[4:0] initially.
 };
 
+/// Emulates ARM instructions for unwinding and single-stepping.
 class EmulateInstructionARM : public EmulateInstruction {
 public:
   enum ARMEncoding {

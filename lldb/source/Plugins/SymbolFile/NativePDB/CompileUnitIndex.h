@@ -34,6 +34,7 @@ namespace lldb_private {
 namespace npdb {
 class PdbIndex;
 
+/// Aggregates compile unit information from various PDB streams.
 /// Represents a single compile unit.  This class is useful for collecting the
 /// important accessors and information about a compile unit from disparate
 /// parts of the PDB into a single place, simplifying acess to compile unit
@@ -86,6 +87,7 @@ struct CompilandIndexItem {
   GlobalLineTable m_global_line_table;
 };
 
+/// Maps module indices to their corresponding CompilandIndexItem.
 /// Indexes information about all compile units.  This is really just a map of
 /// global compile unit index to |CompilandIndexItem| structures.
 class CompileUnitIndex {

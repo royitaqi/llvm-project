@@ -19,6 +19,7 @@
 namespace lldb_private {
 namespace platform_android {
 
+/// Platform plugin for debugging on Android devices.
 class PlatformAndroid : public platform_linux::PlatformLinux {
 public:
   PlatformAndroid(bool is_host);

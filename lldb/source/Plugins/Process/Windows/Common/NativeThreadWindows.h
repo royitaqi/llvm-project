@@ -19,6 +19,8 @@ namespace lldb_private {
 
 class NativeProcessWindows;
 
+/// Native thread implementation for Windows, managing thread state and
+/// hardware debug features on Windows systems.
 class NativeThreadWindows : public NativeThreadProtocol {
 public:
   NativeThreadWindows(NativeProcessWindows &process, const HostThread &thread);

@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Platform plugin for debugging WebAssembly targets.
 class PlatformWasm : public RemoteAwarePlatform {
 public:
   static void Initialize();

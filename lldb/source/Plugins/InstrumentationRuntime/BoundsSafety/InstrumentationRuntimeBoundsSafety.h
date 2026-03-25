@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Instrumentation runtime plugin for bounds safety violation detection.
 class InstrumentationRuntimeBoundsSafety
     : public lldb_private::InstrumentationRuntime {
 public:

@@ -13,6 +13,10 @@
 #include "lldb/Core/Value.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the macOS i386 calling convention.
+///
+/// Handles argument passing and register usage for 32-bit x86
+/// on macOS and other Darwin-based Apple platforms.
 class ABIMacOSX_i386 : public ABIX86_i386 {
 public:
   ~ABIMacOSX_i386() override = default;

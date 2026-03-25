@@ -12,6 +12,8 @@
 #include "lldb/Symbol/SymbolVendor.h"
 #include "lldb/lldb-private.h"
 
+/// Symbol vendor for macOS, locating and loading debug information from
+/// dSYM bundles and DWARF debug maps.
 class SymbolVendorMacOSX : public lldb_private::SymbolVendor {
 public:
   // Static Functions

@@ -19,6 +19,7 @@ namespace lldb_private {
 
 class AppleObjCExternalASTSource;
 
+/// Declaration vendor for Objective-C runtime classes.
 class AppleObjCDeclVendor : public DeclVendor {
 public:
   AppleObjCDeclVendor(ObjCLanguageRuntime &runtime);

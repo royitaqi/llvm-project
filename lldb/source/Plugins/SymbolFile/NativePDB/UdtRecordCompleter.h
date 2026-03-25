@@ -37,6 +37,7 @@ class CompilerType;
 namespace npdb {
 class PdbIndex;
 
+/// Visitor for completing user-defined types (structs, classes, unions).
 class UdtRecordCompleter : public llvm::codeview::TypeVisitorCallbacks {
   using IndexedBase =
       std::pair<uint64_t, std::unique_ptr<clang::CXXBaseSpecifier>>;

@@ -41,6 +41,7 @@ class SymbolFileDWARF;
 
 struct ParsedDWARFTypeAttributes;
 
+/// Clang-specific implementation for parsing DWARF debug info into AST.
 class DWARFASTParserClang : public lldb_private::plugin::dwarf::DWARFASTParser {
 public:
   DWARFASTParserClang(lldb_private::TypeSystemClang &ast);

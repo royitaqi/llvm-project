@@ -23,6 +23,7 @@ class ArchSpec;
 class FileSpec;
 class UUID;
 
+/// Platform plugin for debugging remote macOS targets.
 class PlatformRemoteMacOSX : public virtual PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteMacOSX();

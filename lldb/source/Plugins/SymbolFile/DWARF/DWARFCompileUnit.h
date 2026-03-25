@@ -18,6 +18,7 @@ class DWARFAbbreviationDeclarationSet;
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Represents a DWARF compile unit (DW_TAG_compile_unit).
 class DWARFCompileUnit : public DWARFUnit {
 public:
   void BuildAddressRangeTable(DWARFDebugAranges *debug_aranges) override;

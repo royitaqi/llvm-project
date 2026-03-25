@@ -21,6 +21,7 @@ namespace lldb_private {
 class ScriptInterpreter;
 }
 
+/// Operating system plugin that uses Python scripts to provide thread information.
 class OperatingSystemPython : public lldb_private::OperatingSystem {
 public:
   OperatingSystemPython(lldb_private::Process *process,

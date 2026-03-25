@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Architecture plugin for AArch64, providing memory tagging support and SVE register reconfiguration.
 class ArchitectureAArch64 : public Architecture {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "aarch64"; }

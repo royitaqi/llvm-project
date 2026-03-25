@@ -18,6 +18,7 @@
 namespace lldb_private {
 class ArchSpec;
 
+/// Platform plugin for debugging remote iOS devices.
 class PlatformRemoteiOS : public PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteiOS();

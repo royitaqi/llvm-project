@@ -15,6 +15,8 @@
 
 class ProcessMachCore;
 
+/// Thread representation for Mach-O core dump debugging, providing access
+/// to saved thread state and register context from the core file.
 class ThreadMachCore : public lldb_private::Thread {
 public:
   ThreadMachCore(lldb_private::Process &process, lldb::tid_t tid,

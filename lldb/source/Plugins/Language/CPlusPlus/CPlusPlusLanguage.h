@@ -20,6 +20,7 @@
 
 namespace lldb_private {
 
+/// Language plugin for C++.
 class CPlusPlusLanguage : public Language {
 public:
   class CxxMethodName : public Language::MethodName {

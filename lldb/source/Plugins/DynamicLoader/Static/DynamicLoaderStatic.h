@@ -14,6 +14,7 @@
 #include "lldb/Utility/FileSpec.h"
 #include "lldb/Utility/UUID.h"
 
+/// Dynamic loader plugin for statically-linked executables with no runtime linker.
 class DynamicLoaderStatic : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderStatic(lldb_private::Process *process);

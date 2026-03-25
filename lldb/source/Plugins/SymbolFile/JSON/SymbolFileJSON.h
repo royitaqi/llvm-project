@@ -18,6 +18,7 @@
 
 namespace lldb_private {
 
+/// SymbolFile plugin for loading symbols from JSON files.
 class SymbolFileJSON : public lldb_private::SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

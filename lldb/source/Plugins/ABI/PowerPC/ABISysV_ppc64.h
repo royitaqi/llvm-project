@@ -13,6 +13,10 @@
 #include "lldb/lldb-forward.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV PowerPC64 calling convention.
+///
+/// Implements the System V ABI for 64-bit PowerPC processors,
+/// supporting both big-endian and little-endian (ppc64le) variants.
 class ABISysV_ppc64 : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_ppc64() override = default;

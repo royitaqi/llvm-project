@@ -42,6 +42,7 @@ enum class CallingConvention : uint8_t;
 namespace lldb_private {
 namespace npdb {
 
+/// Tracks the parsing status of a Clang declaration.
 struct DeclStatus {
   DeclStatus() = default;
   DeclStatus(lldb::user_id_t uid, bool resolved)
@@ -50,6 +51,7 @@ struct DeclStatus {
   bool resolved = false;
 };
 
+/// Clang-specific implementation for building AST from PDB records.
 class PdbAstBuilderClang : public PdbAstBuilder {
 public:
   PdbAstBuilderClang(TypeSystemClang &clang);

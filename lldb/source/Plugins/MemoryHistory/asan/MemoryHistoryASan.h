@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Memory history plugin for AddressSanitizer.
 class MemoryHistoryASan : public lldb_private::MemoryHistory {
 public:
   ~MemoryHistoryASan() override = default;

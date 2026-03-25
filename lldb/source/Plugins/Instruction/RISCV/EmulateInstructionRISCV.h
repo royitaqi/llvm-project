@@ -20,6 +20,7 @@
 
 namespace lldb_private {
 
+/// Predicts single-step breakpoint locations for RISC-V instructions, including atomic sequences.
 class RISCVSingleStepBreakpointLocationsPredictor
     : public SingleStepBreakpointLocationsPredictor {
 public:
@@ -47,6 +48,7 @@ private:
   static constexpr size_t s_max_atomic_sequence_length = 64;
 };
 
+/// Emulates RISC-V instructions for unwinding and single-stepping.
 class EmulateInstructionRISCV : public EmulateInstruction {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "riscv"; }

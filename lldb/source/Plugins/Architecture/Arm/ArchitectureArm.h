@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Architecture plugin for ARM, handling Thumb/ARM mode transitions and stack unwinding.
 class ArchitectureArm : public Architecture {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "arm"; }

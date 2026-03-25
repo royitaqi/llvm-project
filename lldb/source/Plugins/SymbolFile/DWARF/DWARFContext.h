@@ -18,6 +18,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Manages lazy loading and caching of DWARF section data.
 class DWARFContext {
 private:
   SectionList *m_main_section_list;

@@ -24,6 +24,7 @@
 #include "lldb/Symbol/SaveCoreOptions.h"
 #include "lldb/Utility/ArchSpec.h"
 
+/// Plugin for saving core files in minidump format.
 class ObjectFileMinidump : public lldb_private::PluginInterface {
 public:
   // Static Functions

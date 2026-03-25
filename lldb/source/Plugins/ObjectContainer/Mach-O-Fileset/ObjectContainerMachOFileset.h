@@ -15,6 +15,7 @@
 
 namespace lldb_private {
 
+/// ObjectContainer plugin for Mach-O fileset binaries.
 class ObjectContainerMachOFileset : public lldb_private::ObjectContainer {
 public:
   ObjectContainerMachOFileset(const lldb::ModuleSP &module_sp,

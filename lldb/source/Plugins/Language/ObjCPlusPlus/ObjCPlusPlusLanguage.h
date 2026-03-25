@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Language plugin for Objective-C++.
 class ObjCPlusPlusLanguage : public Language {
 public:
   ObjCPlusPlusLanguage() = default;

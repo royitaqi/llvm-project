@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Emulates PowerPC64 instructions for unwinding and single-stepping.
 class EmulateInstructionPPC64 : public EmulateInstruction {
 public:
   EmulateInstructionPPC64(const ArchSpec &arch);

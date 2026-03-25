@@ -16,6 +16,9 @@
 
 namespace lldb_private {
 
+/// Metadata associated with Clang AST nodes for LLDB's purposes.
+/// Stores user IDs, ISA pointers, object pointer information, and type properties
+/// for Clang AST types and declarations used during expression evaluation.
 class ClangASTMetadata {
 public:
   ClangASTMetadata()

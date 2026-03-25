@@ -19,12 +19,11 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
-// DWARFDeclContext
-//
-// A class that represents a declaration context all the way down to a
-// DIE. This is useful when trying to find a DIE in one DWARF to a DIE
-// in another DWARF file.
-
+/// Represents a declaration context chain from a DIE to its parent scopes.
+///
+/// A class that represents a declaration context all the way down to a
+/// DIE. This is useful when trying to find a DIE in one DWARF to a DIE
+/// in another DWARF file.
 class DWARFDeclContext {
 public:
   struct Entry {

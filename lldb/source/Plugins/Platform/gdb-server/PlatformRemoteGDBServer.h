@@ -20,6 +20,7 @@
 namespace lldb_private {
 namespace platform_gdb_server {
 
+/// Generic platform plugin for debugging remote targets via GDB remote protocol.
 class PlatformRemoteGDBServer : public Platform, private UserIDResolver {
 public:
   static void Initialize();

@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Architecture plugin for MIPS, handling microMIPS mode and ISA delay slots.
 class ArchitectureMips : public Architecture {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "mips"; }

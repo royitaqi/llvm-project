@@ -16,6 +16,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Represents a DWARF Debug Info Entry with full capabilities.
 class DWARFDIE : public DWARFBaseDIE {
 public:
   class child_iterator;

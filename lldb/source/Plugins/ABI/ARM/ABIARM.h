@@ -9,6 +9,9 @@
 #ifndef LLDB_SOURCE_PLUGINS_ABI_ARM_ABIARM_H
 #define LLDB_SOURCE_PLUGINS_ABI_ARM_ABIARM_H
 
+/// Utility class for ARM ABI plugin initialization.
+///
+/// Provides static methods to initialize and terminate all ARM ABI plugins.
 class ABIARM {
 public:
   static void Initialize();

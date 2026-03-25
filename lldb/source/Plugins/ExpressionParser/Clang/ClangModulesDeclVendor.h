@@ -18,6 +18,9 @@
 
 namespace lldb_private {
 
+/// Provides declarations from imported Clang modules.
+/// Manages loading and querying C/C++/Objective-C modules during expression
+/// evaluation to provide accurate type information from module definitions.
 class ClangModulesDeclVendor : public DeclVendor {
 public:
   // Constructors and Destructors

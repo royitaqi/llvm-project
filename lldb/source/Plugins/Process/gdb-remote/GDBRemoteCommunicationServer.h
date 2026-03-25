@@ -25,6 +25,8 @@ namespace process_gdb_remote {
 
 class ProcessGDBRemote;
 
+/// Base server-side implementation of the GDB remote protocol, handling
+/// incoming packets and dispatching them to registered handlers.
 class GDBRemoteCommunicationServer : public GDBRemoteCommunication {
 public:
   using PacketHandler =

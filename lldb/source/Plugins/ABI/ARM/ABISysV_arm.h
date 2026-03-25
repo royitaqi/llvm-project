@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV ARM calling convention.
+///
+/// Implements the standard System V ABI for 32-bit ARM processors,
+/// supporting both hard-float and soft-float calling conventions.
 class ABISysV_arm : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_arm() override = default;

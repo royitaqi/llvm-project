@@ -12,6 +12,8 @@
 #include "lldb/Symbol/SymbolVendor.h"
 #include "lldb/lldb-private.h"
 
+/// Symbol vendor for PE/COFF object files on Windows, locating and loading
+/// debug information from PDB files.
 class SymbolVendorPECOFF : public lldb_private::SymbolVendor {
 public:
   // Constructors and Destructors

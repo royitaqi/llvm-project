@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Platform plugin for debugging WebAssembly targets via GDB remote protocol.
 class PlatformWasmRemoteGDBServer
     : public platform_gdb_server::PlatformRemoteGDBServer {
 public:

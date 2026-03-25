@@ -20,6 +20,7 @@
 
 class AuxVector;
 
+/// Dynamic loader plugin for POSIX systems using ELF and the r_debug rendezvous mechanism.
 class DynamicLoaderPOSIXDYLD : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderPOSIXDYLD(lldb_private::Process *process);

@@ -28,6 +28,7 @@
 
 #include "DynamicLoaderDarwin.h"
 
+/// Dynamic loader plugin for modern macOS/iOS (2016+) using dyld SPI.
 class DynamicLoaderMacOS : public lldb_private::DynamicLoaderDarwin {
 public:
   DynamicLoaderMacOS(lldb_private::Process *process);

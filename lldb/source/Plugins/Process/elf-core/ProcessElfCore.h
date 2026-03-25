@@ -28,6 +28,8 @@
 
 struct ThreadData;
 
+/// Process plugin for debugging ELF core dump files, extracting thread
+/// contexts and memory regions from PT_NOTE and PT_LOAD segments.
 class ProcessElfCore : public lldb_private::PostMortemProcess {
 public:
   // Constructors and Destructors

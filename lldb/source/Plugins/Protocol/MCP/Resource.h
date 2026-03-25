@@ -20,6 +20,7 @@
 
 namespace lldb_private::mcp {
 
+/// MCP resource provider that exposes LLDB debugger state as resources.
 class DebuggerResourceProvider : public lldb_protocol::mcp::ResourceProvider {
 public:
   using ResourceProvider::ResourceProvider;

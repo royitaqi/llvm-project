@@ -21,6 +21,9 @@ class Module;
 
 namespace lldb_private {
 
+/// Forwards ExternalASTSource callbacks to TypeSystemClang.
+/// Acts as a bridge between Clang's AST completion mechanisms and LLDB's
+/// type system, delegating completion requests to the appropriate handlers.
 class ClangExternalASTSourceCallbacks : public clang::ExternalASTSource {
   /// LLVM RTTI support.
   static char ID;

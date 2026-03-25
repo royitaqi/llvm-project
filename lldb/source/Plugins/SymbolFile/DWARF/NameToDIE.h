@@ -21,6 +21,7 @@ namespace lldb_private::plugin {
 namespace dwarf {
 class DWARFUnit;
 
+/// Maps symbol names to their corresponding DIE references.
 class NameToDIE {
 public:
   NameToDIE() : m_map() {}

@@ -15,6 +15,7 @@
 namespace lldb_private {
 namespace platform_netbsd {
 
+/// Platform plugin for debugging on NetBSD hosts and remote NetBSD targets.
 class PlatformNetBSD : public PlatformPOSIX {
 public:
   PlatformNetBSD(bool is_host);

@@ -22,9 +22,8 @@
 
 namespace lldb_private {
 
-// x86AssemblyInspectionEngine - a class which will take a buffer of bytes
-// of i386/x86_64 instructions and create an UnwindPlan based on those
-// assembly instructions.
+/// Assembly inspection engine for x86/x86_64, analyzing instruction sequences
+/// to extract stack frame layout and create unwind plans for debugging.
 class x86AssemblyInspectionEngine {
 
 public:

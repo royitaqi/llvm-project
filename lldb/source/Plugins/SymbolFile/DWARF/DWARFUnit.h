@@ -40,6 +40,7 @@ enum DWARFProducer {
   eProducerOther
 };
 
+/// Represents a DWARF compile unit or type unit.
 class DWARFUnit : public DWARFExpression::Delegate, public UserID {
   using die_iterator_range =
       llvm::iterator_range<DWARFDebugInfoEntry::collection::iterator>;

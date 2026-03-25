@@ -31,6 +31,7 @@ class DWARFCompileUnit;
 class DWARFDebugAranges;
 class DWARFDeclContext;
 
+/// SymbolFile plugin for DWARF debug info in .o files on macOS (debug map).
 class SymbolFileDWARFDebugMap : public SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

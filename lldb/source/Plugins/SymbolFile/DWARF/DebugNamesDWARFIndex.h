@@ -19,6 +19,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Implementation of DWARFIndex using DWARF5 .debug_names accelerator table.
 class DebugNamesDWARFIndex : public DWARFIndex {
 public:
   static llvm::Expected<std::unique_ptr<DebugNamesDWARFIndex>>

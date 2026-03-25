@@ -9,6 +9,9 @@
 #ifndef LLDB_SOURCE_PLUGINS_ABI_POWERPC_ABIPOWERPC_H
 #define LLDB_SOURCE_PLUGINS_ABI_POWERPC_ABIPOWERPC_H
 
+/// Utility class for PowerPC ABI plugin initialization.
+///
+/// Provides static methods to initialize and terminate all PowerPC ABI plugins.
 class ABIPowerPC {
 public:
   static void Initialize();

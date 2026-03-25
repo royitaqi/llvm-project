@@ -19,6 +19,7 @@
 
 namespace lldb_private {
 
+/// SymbolFile plugin that reads debug info from CTF sections.
 class SymbolFileCTF : public lldb_private::SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

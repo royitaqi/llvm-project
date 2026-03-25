@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// ObjectFile plugin for reading PDB (Program Database) files.
 class ObjectFilePDB : public ObjectFile {
 public:
   // Static Functions

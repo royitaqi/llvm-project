@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Specialized DataExtractor for DWARF data with LLVM interoperability.
 class DWARFDataExtractor : public DataExtractor {
 public:
   DWARFDataExtractor() = default;

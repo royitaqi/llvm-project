@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Instrumentation runtime plugin for AddressSanitizer (ASan) memory error detection.
 class InstrumentationRuntimeASan : public lldb_private::InstrumentationRuntime {
 public:
   ~InstrumentationRuntimeASan() override;

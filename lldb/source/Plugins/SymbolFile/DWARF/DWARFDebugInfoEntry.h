@@ -27,6 +27,7 @@ class DWARFDeclContext;
 
 #define DIE_SIBLING_IDX_BITSIZE 31
 
+/// Represents a DWARF Debug Info Entry stored in contiguous memory.
 /// DWARFDebugInfoEntry objects assume that they are living in one big
 /// vector and do pointer arithmetic on their this pointers. Don't
 /// pass them by value. Due to the way they are constructed in a

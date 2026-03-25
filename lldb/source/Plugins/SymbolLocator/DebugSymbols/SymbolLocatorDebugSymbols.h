@@ -14,6 +14,8 @@
 
 namespace lldb_private {
 
+/// Symbol locator for macOS/iOS using DBGShellCommands and Spotlight to find
+/// dSYM bundles and debug symbol files.
 class SymbolLocatorDebugSymbols : public SymbolLocator {
 public:
   SymbolLocatorDebugSymbols();

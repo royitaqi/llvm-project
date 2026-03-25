@@ -22,6 +22,8 @@
 
 namespace lldb_private {
 
+/// Stop reason for Mach exceptions on macOS/iOS, translating kernel exception
+/// codes into debugger stop reasons like breakpoints and signals.
 class StopInfoMachException : public StopInfo {
   /// Determine the pointer-authentication related failure that caused this
   /// exception. Returns true and fills out the failure description if there

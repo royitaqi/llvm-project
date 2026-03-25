@@ -33,6 +33,7 @@ class Stream;
 class Target;
 class UUID;
 
+/// Base platform plugin for remote Darwin devices (iOS, tvOS, watchOS, etc.).
 class PlatformRemoteDarwinDevice : public PlatformDarwinDevice {
 public:
   PlatformRemoteDarwinDevice();

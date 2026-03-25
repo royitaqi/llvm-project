@@ -14,6 +14,7 @@
 
 namespace lldb_private {
 
+/// Syntax highlighter for Rust using Tree-sitter.
 class RustTreeSitterHighlighter : public TreeSitterHighlighter {
 public:
   RustTreeSitterHighlighter() = default;

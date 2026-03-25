@@ -11,6 +11,7 @@
 
 #include "lldb/Target/InstrumentationRuntime.h"
 
+/// Instrumentation runtime plugin for AddressSanitizer using libsanitizers.
 class InstrumentationRuntimeASanLibsanitizers
     : public lldb_private::InstrumentationRuntime {
 public:

@@ -22,6 +22,7 @@ class Stream;
 
 namespace npdb {
 
+/// Abstract interface for constructing AST types from PDB records.
 class PdbAstBuilder {
 public:
   virtual ~PdbAstBuilder() = default;

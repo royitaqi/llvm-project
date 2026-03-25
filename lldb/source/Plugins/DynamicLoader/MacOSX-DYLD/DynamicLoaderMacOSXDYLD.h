@@ -32,6 +32,7 @@
 
 #include "DynamicLoaderDarwin.h"
 
+/// Dynamic loader plugin for legacy macOS/iOS (pre-2016) reading dyld internal structures.
 class DynamicLoaderMacOSXDYLD : public lldb_private::DynamicLoaderDarwin {
 public:
   DynamicLoaderMacOSXDYLD(lldb_private::Process *process);
@@ -97,6 +98,7 @@ protected:
                              ImageInfo &dylib_info,
                              lldb_private::FileSpec *lc_id_dylinker);
 
+  /// Snapshot of dyld's internal all_image_infos structure.
   struct DYLDAllImageInfos {
     uint32_t version = 0;
     uint32_t dylib_info_count = 0;                            // Version >= 1

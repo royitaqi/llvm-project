@@ -16,6 +16,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV ARC calling convention.
+///
+/// Implements the System V ABI for Synopsys ARC processors,
+/// supporting both standard and reduced register file configurations.
 class ABISysV_arc : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_arc() override = default;

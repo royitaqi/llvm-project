@@ -13,6 +13,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV MSP430 calling convention.
+///
+/// Implements the System V ABI for Texas Instruments MSP430
+/// 16-bit microcontrollers.
 class ABISysV_msp430 : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_msp430() override = default;

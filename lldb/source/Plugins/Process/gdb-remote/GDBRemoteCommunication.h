@@ -68,6 +68,8 @@ enum GDBErrno {
 
 class ProcessGDBRemote;
 
+/// Base class for GDB remote protocol communication, handling packet
+/// transmission, reception, and acknowledgement over a connection.
 class GDBRemoteCommunication : public Communication {
 public:
   enum class PacketType { Invalid = 0, Standard, Notify };

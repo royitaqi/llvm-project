@@ -94,6 +94,8 @@ private:
   // The counter used by GetNextPersistentVariableName
   uint32_t m_next_persistent_variable_id = 0;
 
+  /// Represents a persistent declaration registered by the user.
+  /// Tracks both the Clang NamedDecl and its associated TypeSystemClang context.
   struct PersistentDecl {
     /// The persistent decl.
     clang::NamedDecl *m_decl = nullptr;

@@ -22,6 +22,8 @@
 namespace lldb_private {
 namespace process_gdb_remote {
 
+/// GDB remote protocol server for lldb-server (platform mode), managing
+/// platform-level operations like launching debug servers and file operations.
 class GDBRemoteCommunicationServerPlatform
     : public GDBRemoteCommunicationServerCommon {
 public:

@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Instrumentation runtime plugin for detecting improper API usage off the main thread.
 class InstrumentationRuntimeMainThreadChecker
     : public lldb_private::InstrumentationRuntime {
 public:

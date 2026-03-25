@@ -22,6 +22,7 @@
 
 class PDBASTParser;
 
+/// SymbolFile plugin using LLVM's DIA-based PDB reader (legacy).
 class SymbolFilePDB : public lldb_private::SymbolFileCommon {
   /// LLVM RTTI support.
   static char ID;

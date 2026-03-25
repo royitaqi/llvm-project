@@ -14,6 +14,7 @@
 namespace lldb_private {
 namespace platform_openbsd {
 
+/// Platform plugin for debugging on OpenBSD hosts and remote OpenBSD targets.
 class PlatformOpenBSD : public PlatformPOSIX {
 public:
   PlatformOpenBSD(bool is_host);

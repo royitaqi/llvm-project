@@ -16,6 +16,7 @@
 #include "clang/AST/ASTContext.h"
 
 namespace lldb_private {
+/// Parser for Objective-C type encoding strings.
 class AppleObjCTypeEncodingParser : public ObjCLanguageRuntime::EncodingToType {
 public:
   AppleObjCTypeEncodingParser(ObjCLanguageRuntime &runtime);

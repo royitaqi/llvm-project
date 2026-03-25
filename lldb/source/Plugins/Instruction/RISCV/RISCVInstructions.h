@@ -19,12 +19,14 @@ namespace lldb_private {
 
 class EmulateInstructionRISCV;
 
+/// Represents a RISC-V destination register for instruction emulation.
 struct Rd {
   uint32_t rd;
   bool Write(EmulateInstructionRISCV &emulator, uint64_t value);
   bool WriteAPFloat(EmulateInstructionRISCV &emulator, llvm::APFloat value);
 };
 
+/// Represents a RISC-V source register for instruction emulation.
 struct Rs {
   uint32_t rs;
   std::optional<uint64_t> Read(EmulateInstructionRISCV &emulator);
@@ -294,6 +296,7 @@ constexpr uint8_t RV32 = 1;
 constexpr uint8_t RV64 = 2;
 constexpr uint8_t RV128 = 4;
 
+/// Defines a pattern for matching and decoding RISC-V instructions.
 struct InstrPattern {
   const char *name;
   /// Bit mask to check the type of a instruction (B-Type, I-Type, J-Type, etc.)
@@ -305,6 +308,7 @@ struct InstrPattern {
   uint8_t inst_type = RV32 | RV64 | RV128;
 };
 
+/// Contains the result of decoding a RISC-V instruction.
 struct DecodeResult {
   RISCVInst decoded;
   uint32_t inst;

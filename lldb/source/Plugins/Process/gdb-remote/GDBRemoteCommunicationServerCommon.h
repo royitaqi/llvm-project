@@ -23,6 +23,8 @@ namespace process_gdb_remote {
 
 class ProcessGDBRemote;
 
+/// Common base class for GDB remote server implementations, providing
+/// shared packet handlers for platform and process operations.
 class GDBRemoteCommunicationServerCommon : public GDBRemoteCommunicationServer {
 public:
   GDBRemoteCommunicationServerCommon();

@@ -15,6 +15,7 @@
 namespace lldb_private {
 namespace breakpad {
 
+/// ObjectFile plugin for reading Breakpad symbol files.
 class ObjectFileBreakpad : public ObjectFile {
 public:
   // Static Functions

@@ -20,6 +20,8 @@
 
 namespace lldb_private {
 
+/// A diagnostic produced by Clang during expression compilation.
+/// Wraps Clang diagnostics with LLDB-specific context and fix-it hints.
 class ClangDiagnostic : public Diagnostic {
 public:
   typedef std::vector<clang::FixItHint> FixItList;

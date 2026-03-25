@@ -16,6 +16,8 @@
 
 namespace lldb_private {
 
+/// Unwinder for history threads, providing stack frame information from
+/// a pre-recorded list of program counter addresses.
 class HistoryUnwind : public lldb_private::Unwind {
 public:
   HistoryUnwind(Thread &thread, std::vector<lldb::addr_t> pcs,

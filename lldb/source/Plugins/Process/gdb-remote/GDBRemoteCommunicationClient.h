@@ -57,6 +57,8 @@ struct PidTid {
   uint64_t tid;
 };
 
+/// Client-side implementation of the GDB remote protocol, handling
+/// queries and commands sent to a remote debug server.
 class GDBRemoteCommunicationClient : public GDBRemoteClientBase {
 public:
   GDBRemoteCommunicationClient();

@@ -18,6 +18,7 @@
 // It is the default library archive format for the AIX operating system.
 // Ref: https://www.ibm.com/docs/en/aix/7.3.0?topic=formats-ar-file-format-big
 
+/// ObjectContainer plugin for AIX Big Archive format.
 class ObjectContainerBigArchive : public lldb_private::ObjectContainer {
 public:
   ObjectContainerBigArchive(const lldb::ModuleSP &module_sp,

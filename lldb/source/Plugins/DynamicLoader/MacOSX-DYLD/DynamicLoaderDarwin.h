@@ -24,6 +24,7 @@
 
 namespace lldb_private {
 
+/// Base class for Darwin (macOS/iOS/etc) dynamic loader plugins, providing common dyld functionality.
 class DynamicLoaderDarwin : public lldb_private::DynamicLoader {
 public:
   DynamicLoaderDarwin(lldb_private::Process *process);
@@ -75,6 +76,7 @@ protected:
 
   void ClearDYLDModule();
 
+  /// Represents a Mach-O segment's load information.
   class Segment {
   public:
     Segment() : name() {}
@@ -96,6 +98,7 @@ protected:
     void PutToLog(lldb_private::Log *log, lldb::addr_t slide) const;
   };
 
+  /// Information about a loaded dylib or executable image.
   struct ImageInfo {
     /// Address of mach header for this dylib.
     lldb::addr_t address = LLDB_INVALID_ADDRESS;

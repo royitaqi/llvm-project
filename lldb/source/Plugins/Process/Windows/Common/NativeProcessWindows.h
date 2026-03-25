@@ -24,9 +24,8 @@ class NativeDebugDelegate;
 
 typedef std::shared_ptr<NativeDebugDelegate> NativeDebugDelegateSP;
 
-//------------------------------------------------------------------
-// NativeProcessWindows
-//------------------------------------------------------------------
+/// Native process implementation for Windows, controlling debuggee processes
+/// directly via the Windows debugging API for lldb-server.
 class NativeProcessWindows : public NativeProcessProtocol,
                              public ProcessDebugger {
 

@@ -13,6 +13,10 @@
 #include "lldb/Utility/ConstString.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the macOS arm64 calling convention.
+///
+/// Handles argument passing, return values, and register usage for
+/// Apple Silicon platforms (macOS/iOS/tvOS/watchOS arm64 targets).
 class ABIMacOSX_arm64 : public ABIAArch64 {
 public:
   ~ABIMacOSX_arm64() override = default;

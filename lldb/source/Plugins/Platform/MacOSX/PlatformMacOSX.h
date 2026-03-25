@@ -28,6 +28,7 @@ class ModuleSpec;
 class Process;
 class Target;
 
+/// Platform plugin for debugging on macOS hosts and remote macOS targets.
 class PlatformMacOSX : public PlatformDarwinDevice {
 public:
   PlatformMacOSX();

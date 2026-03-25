@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Instrumentation runtime plugin for UndefinedBehaviorSanitizer (UBSan) detection.
 class InstrumentationRuntimeUBSan
     : public lldb_private::InstrumentationRuntime {
 public:

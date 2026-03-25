@@ -22,6 +22,8 @@ namespace process_freebsd {
 
 class NativeProcessFreeBSD;
 
+/// Native thread implementation for FreeBSD, managing thread state and
+/// hardware debug features via ptrace on FreeBSD systems.
 class NativeThreadFreeBSD : public NativeThreadProtocol {
   friend class NativeProcessFreeBSD;
 

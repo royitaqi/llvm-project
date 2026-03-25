@@ -13,6 +13,7 @@
 
 namespace lldb_private {
 
+/// Architecture plugin for PPC64, handling local and global entry points for functions.
 class ArchitecturePPC64 : public Architecture {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "ppc64"; }

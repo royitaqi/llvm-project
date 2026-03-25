@@ -25,6 +25,7 @@ class MCInstrInfo;
 class MCInst;
 } // namespace llvm
 
+/// Emulates MIPS64 instructions for unwinding and single-stepping.
 class EmulateInstructionMIPS64 : public lldb_private::EmulateInstruction {
 public:
   EmulateInstructionMIPS64(const lldb_private::ArchSpec &arch);

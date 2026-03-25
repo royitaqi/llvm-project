@@ -18,6 +18,7 @@
 
 namespace lldb_private {
 
+/// Language plugin for Objective-C.
 class ObjCLanguage : public Language {
 public:
   class ObjCMethodName {

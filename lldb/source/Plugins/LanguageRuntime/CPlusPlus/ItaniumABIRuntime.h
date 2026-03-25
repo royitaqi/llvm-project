@@ -16,6 +16,7 @@
 
 namespace lldb_private {
 
+/// Helper for C++ runtime support using the Itanium ABI.
 class ItaniumABIRuntime {
 public:
   ItaniumABIRuntime(Process *process);

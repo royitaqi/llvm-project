@@ -12,6 +12,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV s390x calling convention.
+///
+/// Implements the System V ABI for IBM System z (s390x) architecture
+/// used on mainframe systems running Linux.
 class ABISysV_s390x : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_s390x() override = default;

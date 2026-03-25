@@ -21,6 +21,7 @@
 namespace lldb_private {
 class ArchSpec;
 
+/// Platform plugin for debugging remote tvOS devices.
 class PlatformRemoteAppleTV : public PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteAppleTV();

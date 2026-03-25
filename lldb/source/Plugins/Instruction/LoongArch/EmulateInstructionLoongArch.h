@@ -17,6 +17,7 @@
 
 namespace lldb_private {
 
+/// Emulates LoongArch instructions for unwinding and single-stepping.
 class EmulateInstructionLoongArch : public EmulateInstruction {
 public:
   static llvm::StringRef GetPluginNameStatic() { return "LoongArch"; }

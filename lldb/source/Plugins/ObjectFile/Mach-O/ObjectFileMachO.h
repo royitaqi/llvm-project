@@ -20,8 +20,7 @@
 #include "lldb/Utility/UUID.h"
 #include <optional>
 
-// This class needs to be hidden as eventually belongs in a plugin that
-// will export the ObjectFile protocol
+/// ObjectFile plugin for reading Mach-O binaries (32 and 64-bit).
 class ObjectFileMachO : public lldb_private::ObjectFile {
 public:
   ObjectFileMachO(const lldb::ModuleSP &module_sp,

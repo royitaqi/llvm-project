@@ -15,6 +15,7 @@
 
 namespace lldb_private::plugin {
 namespace dwarf {
+/// Implementation of DWARFIndex using Apple accelerator tables (.apple_names, etc).
 class AppleDWARFIndex : public DWARFIndex {
 public:
   static std::unique_ptr<AppleDWARFIndex>

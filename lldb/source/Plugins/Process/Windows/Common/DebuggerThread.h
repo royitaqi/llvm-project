@@ -20,10 +20,8 @@
 
 namespace lldb_private {
 
-// DebuggerThread
-//
-// Debugs a single process, notifying listeners as appropriate when interesting
-// things occur.
+/// Dedicated thread for Windows debugging, handling debug events from the
+/// Windows debugging API and notifying delegates of process state changes.
 class DebuggerThread : public std::enable_shared_from_this<DebuggerThread> {
 public:
   DebuggerThread(DebugDelegateSP debug_delegate);

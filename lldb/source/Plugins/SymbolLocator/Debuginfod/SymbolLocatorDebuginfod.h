@@ -15,6 +15,8 @@
 
 namespace lldb_private {
 
+/// Symbol locator using debuginfod, a service for distributing debug symbols
+/// and source files over HTTP for ELF binaries.
 class SymbolLocatorDebuginfod : public SymbolLocator {
 public:
   SymbolLocatorDebuginfod();

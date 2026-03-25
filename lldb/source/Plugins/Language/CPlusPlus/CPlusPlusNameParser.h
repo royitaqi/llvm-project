@@ -19,7 +19,7 @@
 
 namespace lldb_private {
 
-// Helps to validate and obtain various parts of C++ definitions.
+/// Helps to validate and obtain various parts of C++ definitions.
 class CPlusPlusNameParser {
 public:
   CPlusPlusNameParser(llvm::StringRef text) : m_text(text) { ExtractTokens(); }

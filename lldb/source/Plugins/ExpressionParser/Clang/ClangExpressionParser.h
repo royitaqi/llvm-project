@@ -160,6 +160,7 @@ private:
   std::unique_ptr<clang::CodeGenerator>
       m_code_generator; ///< The Clang object that generates IR
 
+  /// Preprocessor callbacks for handling module imports during expression parsing.
   class LLDBPreprocessorCallbacks;
   LLDBPreprocessorCallbacks *m_pp_callbacks; ///< Called when the preprocessor
                                              ///encounters module imports

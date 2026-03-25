@@ -110,6 +110,7 @@ class DYLDRendezvous {
   // information (struct r_debug) as found in the inferiors memory.  Note that
   // the layout of this struct is not binary compatible, it is simply large
   // enough to hold the information on both 32 and 64 bit platforms.
+  /// Snapshot of the runtime linker's r_debug structure from inferior memory.
   struct Rendezvous {
     uint64_t version = 0;
     lldb::addr_t map_addr = 0;
@@ -131,6 +132,7 @@ class DYLDRendezvous {
 public:
   // Various metadata supplied by the inferior's threading library to describe
   // the per-thread state.
+  /// Thread-local storage metadata from the inferior's threading library.
   struct ThreadInfo {
     bool valid;             // whether we read valid metadata
     uint32_t pthread_size;  // size of struct pthread

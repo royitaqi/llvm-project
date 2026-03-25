@@ -14,6 +14,8 @@
 
 namespace lldb_private {
 
+/// Default symbol locator, searching standard paths and build directories
+/// for debug symbols and executable files.
 class SymbolLocatorDefault : public SymbolLocator {
 public:
   SymbolLocatorDefault();

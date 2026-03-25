@@ -29,6 +29,8 @@ namespace process_gdb_remote {
 
 class ProcessGDBRemote;
 
+/// GDB remote protocol server for lldb-server (llgs mode), handling
+/// debugging sessions by controlling native processes directly.
 class GDBRemoteCommunicationServerLLGS
     : public GDBRemoteCommunicationServerCommon,
       public NativeProcessProtocol::NativeDelegate {

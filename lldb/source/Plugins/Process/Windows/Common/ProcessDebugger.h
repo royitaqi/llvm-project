@@ -45,6 +45,8 @@ public:
   std::set<lldb::tid_t> m_exited_threads;
 };
 
+/// Base class providing Windows debugging functionality, managing process
+/// launch/attach and debug event handling via the Windows debugging API.
 class ProcessDebugger {
 
 public:

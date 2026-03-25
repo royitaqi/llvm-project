@@ -23,6 +23,7 @@
 
 namespace lldb_private::mcp {
 
+/// Protocol server plugin implementing the Model Context Protocol (MCP).
 class ProtocolServerMCP : public ProtocolServer {
 
   using ServerUP = std::unique_ptr<lldb_protocol::mcp::Server>;

@@ -13,6 +13,10 @@
 #include "lldb/Target/ABI.h"
 #include "lldb/lldb-private.h"
 
+/// ABI plugin for the SysV Hexagon calling convention.
+///
+/// Implements the System V ABI for Qualcomm Hexagon DSP processors,
+/// supporting LLVM IR type-based function calls.
 class ABISysV_hexagon : public lldb_private::RegInfoBasedABI {
 public:
   ~ABISysV_hexagon() override = default;

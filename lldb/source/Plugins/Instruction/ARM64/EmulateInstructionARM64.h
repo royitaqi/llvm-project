@@ -15,6 +15,7 @@
 #include "lldb/Utility/Status.h"
 #include <optional>
 
+/// Emulates ARM64 instructions for unwinding and single-stepping.
 class EmulateInstructionARM64 : public lldb_private::EmulateInstruction {
 public:
   EmulateInstructionARM64(const lldb_private::ArchSpec &arch)

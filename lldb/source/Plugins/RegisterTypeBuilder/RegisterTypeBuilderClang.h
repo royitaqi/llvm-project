@@ -13,6 +13,7 @@
 #include "lldb/Target/Target.h"
 
 namespace lldb_private {
+/// Register type builder plugin that creates types using TypeSystemClang.
 class RegisterTypeBuilderClang : public RegisterTypeBuilder {
 public:
   RegisterTypeBuilderClang(Target &target);

@@ -20,6 +20,7 @@
 namespace lldb_private {
 class ArchSpec;
 
+/// Platform plugin for debugging remote bridgeOS devices.
 class PlatformRemoteAppleBridge : public PlatformRemoteDarwinDevice {
 public:
   PlatformRemoteAppleBridge();

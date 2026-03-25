@@ -21,6 +21,7 @@
 
 namespace lldb_private {
 
+/// Language runtime plugin for GNUstep Objective-C runtime.
 class GNUstepObjCRuntime : public lldb_private::ObjCLanguageRuntime {
 public:
   ~GNUstepObjCRuntime() override;

@@ -57,6 +57,8 @@ class ASTStructExtractor;
 class ClangFunctionCaller : public FunctionCaller {
   friend class ASTStructExtractor;
 
+  /// Expression helper for ClangFunctionCaller that manages AST extraction
+  /// of the wrapper function's argument structure.
   class ClangFunctionCallerHelper
       : public llvm::RTTIExtends<ClangFunctionCallerHelper,
                                  ClangExpressionHelper> {

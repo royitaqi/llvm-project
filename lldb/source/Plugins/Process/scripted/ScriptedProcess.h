@@ -20,6 +20,9 @@
 #include <mutex>
 
 namespace lldb_private {
+
+/// Process plugin that allows debugging via a Python script interface,
+/// enabling custom process implementations and synthetic debugging scenarios.
 class ScriptedProcess : public Process {
 public:
   static lldb::ProcessSP CreateInstance(lldb::TargetSP target_sp,

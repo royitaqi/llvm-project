@@ -37,6 +37,7 @@ class Stream;
 class Target;
 class UUID;
 
+/// Platform plugin for debugging in Apple simulators (iOS, tvOS, watchOS, etc.).
 class PlatformAppleSimulator : public PlatformDarwin {
 public:
   // Class Functions
