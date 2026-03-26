@@ -1003,9 +1003,9 @@ TEST(GSYMTest, TestGsymCreatorEncodeErrors) {
                              "attempted to encode invalid InlineInfo object");
 }
 
-static void Compare(const GsymCreator &GC, const GsymReader &GR) {
+static void Compare(const GsymCreator &GC, const GsymReaderV1 &GR) {
   // Verify that all of the data in a GsymCreator is correctly decoded from
-  // a GsymReader. To do this, we iterator over
+  // a GsymReaderV1. To do this, we iterator over
   GC.forEachFunctionInfo([&](const FunctionInfo &FI) -> bool {
     auto DecodedFI = GR.getFunctionInfo(FI.Range.start());
     EXPECT_TRUE(bool(DecodedFI));
@@ -1023,7 +1023,7 @@ static void TestEncodeDecode(const GsymCreator &GC, llvm::endianness ByteOrder,
   FileWriter FW(OutStrm, ByteOrder);
   llvm::Error Err = GC.encode(FW);
   ASSERT_FALSE((bool)Err);
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_TRUE(bool(GR));
   const Header &Hdr = GR->getHeader();
   EXPECT_EQ(Hdr.Version, Version);
@@ -1127,21 +1127,21 @@ TEST(GSYMTest, TestGsymCreator8ByteAddrOffsets) {
                    ArrayRef<uint8_t>(UUID));
 }
 
-static void VerifyFunctionInfo(const GsymReader &GR, uint64_t Addr,
+static void VerifyFunctionInfo(const GsymReaderV1 &GR, uint64_t Addr,
                                const FunctionInfo &FI) {
   auto ExpFI = GR.getFunctionInfo(Addr);
   ASSERT_THAT_EXPECTED(ExpFI, Succeeded());
   ASSERT_EQ(FI, ExpFI.get());
 }
 
-static void VerifyFunctionInfoError(const GsymReader &GR, uint64_t Addr,
+static void VerifyFunctionInfoError(const GsymReaderV1 &GR, uint64_t Addr,
                                     std::string ErrMessage) {
   auto ExpFI = GR.getFunctionInfo(Addr);
   ASSERT_FALSE(bool(ExpFI));
   checkError(ErrMessage, ExpFI.takeError());
 }
 
-TEST(GSYMTest, TestGsymReader) {
+TEST(GSYMTest, TestGsymReaderV1) {
   uint8_t UUID[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   GsymCreator GC;
   GC.setUUID(UUID);
@@ -1162,8 +1162,8 @@ TEST(GSYMTest, TestGsymReader) {
   FileWriter FW(OutStrm, ByteOrder);
   llvm::Error Err = GC.encode(FW);
   ASSERT_FALSE((bool)Err);
-  if (auto ExpectedGR = GsymReader::copyBuffer(OutStrm.str())) {
-    const GsymReader &GR = ExpectedGR.get();
+  if (auto ExpectedGR = GsymReaderV1::copyBuffer(OutStrm.str())) {
+    const GsymReaderV1 &GR = ExpectedGR.get();
     VerifyFunctionInfoError(GR, Func1Addr-1, "address 0xfff is not in GSYM");
 
     FunctionInfo Func1(Func1Addr, FuncSize, Func1Name);
@@ -1228,7 +1228,7 @@ TEST(GSYMTest, TestGsymLookups) {
   FileWriter FW(OutStrm, ByteOrder);
   llvm::Error Err = GC.encode(FW);
   ASSERT_FALSE((bool)Err);
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_TRUE(bool(GR));
 
   // Verify inline info is correct when doing lookups.
@@ -1348,7 +1348,7 @@ TEST(GSYMTest, TestDWARFFunctionWithAddresses) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -1426,7 +1426,7 @@ TEST(GSYMTest, TestDWARFFunctionWithAddressAndOffset) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -1534,7 +1534,7 @@ TEST(GSYMTest, TestDWARFStructMethodNoMangled) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -1640,7 +1640,7 @@ TEST(GSYMTest, TestDWARFTextRanges) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -1669,7 +1669,7 @@ TEST(GSYMTest, TestEmptySymbolEndAddressOfTextRanges) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -1839,7 +1839,7 @@ TEST(GSYMTest, TestDWARFInlineInfo) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -2100,7 +2100,7 @@ TEST(GSYMTest, TestDWARFNoLines) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
 
   EXPECT_EQ(GR->getNumAddresses(), 4u);
@@ -2280,7 +2280,7 @@ TEST(GSYMTest, TestDWARFDeadStripAddr4) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
 
   // Test that the only function that made it was the "main" function.
@@ -2421,7 +2421,7 @@ TEST(GSYMTest, TestDWARFDeadStripAddr8) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
 
   // Test that the only function that made it was the "main" function.
@@ -2500,8 +2500,8 @@ static void AddFunctionInfo(GsymCreator &GC, const char *FuncName,
 }
 
 // Finalize a GsymCreator, encode it and decode it and return the error or
-// GsymReader that was successfully decoded.
-static Expected<GsymReader> FinalizeEncodeAndDecode(GsymCreator &GC) {
+// GsymReaderV1 that was successfully decoded.
+static Expected<GsymReaderV1> FinalizeEncodeAndDecode(GsymCreator &GC) {
   OutputAggregator Null(nullptr);
   Error FinalizeErr = GC.finalize(Null);
   if (FinalizeErr)
@@ -2513,7 +2513,7 @@ static Expected<GsymReader> FinalizeEncodeAndDecode(GsymCreator &GC) {
   llvm::Error Err = GC.encode(FW);
   if (Err)
     return std::move(Err);
-  return GsymReader::copyBuffer(OutStrm.str());
+  return GsymReaderV1::copyBuffer(OutStrm.str());
 }
 
 TEST(GSYMTest, TestGsymSegmenting) {
@@ -2528,15 +2528,15 @@ TEST(GSYMTest, TestGsymSegmenting) {
   AddFunctionInfo(GC, "foo", 0x2000, "/tmp/foo.c", "/tmp/foo.h");
   AddFunctionInfo(GC, "bar", 0x3000, "/tmp/bar.c", "/tmp/bar.h");
   AddFunctionInfo(GC, "baz", 0x4000, "/tmp/baz.c", "/tmp/baz.h");
-  Expected<GsymReader> GR = FinalizeEncodeAndDecode(GC);
+  Expected<GsymReaderV1> GR = FinalizeEncodeAndDecode(GC);
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   //GR->dump(outs());
 
   // Create segmented GSYM files where each file contains 1 function. We will
   // then test doing lookups on the "GR", or the full GSYM file and then test
-  // doing lookups on the GsymReader objects for each segment to ensure we get
+  // doing lookups on the GsymReaderV1 objects for each segment to ensure we get
   // the exact same information. So after all of the code below we will have
-  // GsymReader objects that each contain one function. We name the creators
+  // GsymReaderV1 objects that each contain one function. We name the creators
   // and readers to match the one and only address they contain.
   // GC1000 and GR1000 are for [0x1000-0x1030)
   // GC2000 and GR2000 are for [0x2000-0x2030)
@@ -2583,21 +2583,21 @@ TEST(GSYMTest, TestGsymSegmenting) {
   ASSERT_TRUE(GC3000.get() != nullptr);
   ASSERT_TRUE(GC4000.get() != nullptr);
   ASSERT_TRUE(GCNull.get() == nullptr);
-  // Encode and decode the GsymReader for each segment and verify they succeed.
-  Expected<GsymReader> GR1000 = FinalizeEncodeAndDecode(*GC1000.get());
+  // Encode and decode the GsymReaderV1 for each segment and verify they succeed.
+  Expected<GsymReaderV1> GR1000 = FinalizeEncodeAndDecode(*GC1000.get());
   ASSERT_THAT_EXPECTED(GR1000, Succeeded());
-  Expected<GsymReader> GR2000 = FinalizeEncodeAndDecode(*GC2000.get());
+  Expected<GsymReaderV1> GR2000 = FinalizeEncodeAndDecode(*GC2000.get());
   ASSERT_THAT_EXPECTED(GR2000, Succeeded());
-  Expected<GsymReader> GR3000 = FinalizeEncodeAndDecode(*GC3000.get());
+  Expected<GsymReaderV1> GR3000 = FinalizeEncodeAndDecode(*GC3000.get());
   ASSERT_THAT_EXPECTED(GR3000, Succeeded());
-  Expected<GsymReader> GR4000 = FinalizeEncodeAndDecode(*GC4000.get());
+  Expected<GsymReaderV1> GR4000 = FinalizeEncodeAndDecode(*GC4000.get());
   ASSERT_THAT_EXPECTED(GR4000, Succeeded());
 
   // Verify that all lookups match the range [0x1000-0x1030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR1000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR1000.
   for (uint64_t Addr = 0x1000; Addr < 0x1030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR1000->lookup(Addr);
@@ -2612,10 +2612,10 @@ TEST(GSYMTest, TestGsymSegmenting) {
   }
 
   // Verify that all lookups match the range [0x2000-0x2030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR2000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR2000.
   for (uint64_t Addr = 0x2000; Addr < 0x2030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR2000->lookup(Addr);
@@ -2631,10 +2631,10 @@ TEST(GSYMTest, TestGsymSegmenting) {
   }
 
   // Verify that all lookups match the range [0x3000-0x3030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR3000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR3000.
   for (uint64_t Addr = 0x3000; Addr < 0x3030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR3000->lookup(Addr);
@@ -2649,13 +2649,13 @@ TEST(GSYMTest, TestGsymSegmenting) {
 }
 
   // Verify that all lookups match the range [0x4000-0x4030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR4000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR4000.
   for (uint64_t Addr = 0x4000; Addr < 0x4030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
-    // Lookup in the GsymReader for that contains 0x4000
+    // Lookup in the GsymReaderV1 for that contains 0x4000
     auto SegmentLR = GR4000->lookup(Addr);
     ASSERT_THAT_EXPECTED(SegmentLR, Succeeded());
     // Make sure the lookup results match.
@@ -2679,15 +2679,15 @@ TEST(GSYMTest, TestGsymSegmentingNoBase) {
   AddFunctionInfo(GC, "foo", 0x2000, "/tmp/foo.c", "/tmp/foo.h");
   AddFunctionInfo(GC, "bar", 0x3000, "/tmp/bar.c", "/tmp/bar.h");
   AddFunctionInfo(GC, "baz", 0x4000, "/tmp/baz.c", "/tmp/baz.h");
-  Expected<GsymReader> GR = FinalizeEncodeAndDecode(GC);
+  Expected<GsymReaderV1> GR = FinalizeEncodeAndDecode(GC);
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   //GR->dump(outs());
 
   // Create segmented GSYM files where each file contains 1 function. We will
   // then test doing lookups on the "GR", or the full GSYM file and then test
-  // doing lookups on the GsymReader objects for each segment to ensure we get
+  // doing lookups on the GsymReaderV1 objects for each segment to ensure we get
   // the exact same information. So after all of the code below we will have
-  // GsymReader objects that each contain one function. We name the creators
+  // GsymReaderV1 objects that each contain one function. We name the creators
   // and readers to match the one and only address they contain.
   // GC1000 and GR1000 are for [0x1000-0x1030)
   // GC2000 and GR2000 are for [0x2000-0x2030)
@@ -2734,21 +2734,21 @@ TEST(GSYMTest, TestGsymSegmentingNoBase) {
   ASSERT_TRUE(GC3000.get() != nullptr);
   ASSERT_TRUE(GC4000.get() != nullptr);
   ASSERT_TRUE(GCNull.get() == nullptr);
-  // Encode and decode the GsymReader for each segment and verify they succeed.
-  Expected<GsymReader> GR1000 = FinalizeEncodeAndDecode(*GC1000.get());
+  // Encode and decode the GsymReaderV1 for each segment and verify they succeed.
+  Expected<GsymReaderV1> GR1000 = FinalizeEncodeAndDecode(*GC1000.get());
   ASSERT_THAT_EXPECTED(GR1000, Succeeded());
-  Expected<GsymReader> GR2000 = FinalizeEncodeAndDecode(*GC2000.get());
+  Expected<GsymReaderV1> GR2000 = FinalizeEncodeAndDecode(*GC2000.get());
   ASSERT_THAT_EXPECTED(GR2000, Succeeded());
-  Expected<GsymReader> GR3000 = FinalizeEncodeAndDecode(*GC3000.get());
+  Expected<GsymReaderV1> GR3000 = FinalizeEncodeAndDecode(*GC3000.get());
   ASSERT_THAT_EXPECTED(GR3000, Succeeded());
-  Expected<GsymReader> GR4000 = FinalizeEncodeAndDecode(*GC4000.get());
+  Expected<GsymReaderV1> GR4000 = FinalizeEncodeAndDecode(*GC4000.get());
   ASSERT_THAT_EXPECTED(GR4000, Succeeded());
 
   // Verify that all lookups match the range [0x1000-0x1030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR1000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR1000.
   for (uint64_t Addr = 0x1000; Addr < 0x1030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR1000->lookup(Addr);
@@ -2763,10 +2763,10 @@ TEST(GSYMTest, TestGsymSegmentingNoBase) {
   }
 
   // Verify that all lookups match the range [0x2000-0x2030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR2000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR2000.
   for (uint64_t Addr = 0x2000; Addr < 0x2030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR2000->lookup(Addr);
@@ -2782,10 +2782,10 @@ TEST(GSYMTest, TestGsymSegmentingNoBase) {
   }
 
   // Verify that all lookups match the range [0x3000-0x3030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR3000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR3000.
   for (uint64_t Addr = 0x3000; Addr < 0x3030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
     auto SegmentLR = GR3000->lookup(Addr);
@@ -2800,13 +2800,13 @@ TEST(GSYMTest, TestGsymSegmentingNoBase) {
 }
 
   // Verify that all lookups match the range [0x4000-0x4030) when doing lookups
-  // in the GsymReader that contains all functions and from the segmented
-  // GsymReader in GR4000.
+  // in the GsymReaderV1 that contains all functions and from the segmented
+  // GsymReaderV1 in GR4000.
   for (uint64_t Addr = 0x4000; Addr < 0x4030; ++Addr) {
-    // Lookup in the main GsymReader that contains all function infos
+    // Lookup in the main GsymReaderV1 that contains all function infos
     auto MainLR = GR->lookup(Addr);
     ASSERT_THAT_EXPECTED(MainLR, Succeeded());
-    // Lookup in the GsymReader for that contains 0x4000
+    // Lookup in the GsymReaderV1 for that contains 0x4000
     auto SegmentLR = GR4000->lookup(Addr);
     ASSERT_THAT_EXPECTED(SegmentLR, Succeeded());
     // Make sure the lookup results match.
@@ -3062,7 +3062,7 @@ TEST(GSYMTest, TestDWARFInlineRangeScopes) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -3290,7 +3290,7 @@ TEST(GSYMTest, TestDWARFEmptyInline) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -3527,7 +3527,7 @@ TEST(GSYMTest, TestFinalizeForLineTables) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should only be two functions in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 2u);
@@ -3807,7 +3807,7 @@ TEST(GSYMTest, TestRangeWarnings) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be two functions in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 2u);
@@ -4009,7 +4009,7 @@ TEST(GSYMTest, TestEmptyRangeWarnings) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -4161,7 +4161,7 @@ TEST(GSYMTest, TestEmptyLinkageName) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -4322,7 +4322,7 @@ TEST(GSYMTest, TestLineTablesWithEmptyRanges) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 1u);
@@ -4642,7 +4642,7 @@ TEST(GSYMTest, TestHandlingOfInvalidFileIndexes) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be one function in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 3u);
@@ -4857,7 +4857,7 @@ TEST(GSYMTest, TestLookupsOfOverlappingAndUnequalRanges) {
   const auto ByteOrder = llvm::endianness::native;
   FileWriter FW(OutStrm, ByteOrder);
   ASSERT_THAT_ERROR(GC.encode(FW), Succeeded());
-  Expected<GsymReader> GR = GsymReader::copyBuffer(OutStrm.str());
+  Expected<GsymReaderV1> GR = GsymReaderV1::copyBuffer(OutStrm.str());
   ASSERT_THAT_EXPECTED(GR, Succeeded());
   // There should be two functions in our GSYM.
   EXPECT_EQ(GR->getNumAddresses(), 2u);
