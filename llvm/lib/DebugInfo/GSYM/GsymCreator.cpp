@@ -127,20 +127,7 @@ llvm::Error GsymCreator::encode(FileWriter &O) const {
     // good to catch this during testing.
     assert(AddrOffset <= MaxAddressOffset);
     (void)MaxAddressOffset;
-    switch (Hdr.AddrOffSize) {
-    case 1:
-      O.writeU8(static_cast<uint8_t>(AddrOffset));
-      break;
-    case 2:
-      O.writeU16(static_cast<uint16_t>(AddrOffset));
-      break;
-    case 4:
-      O.writeU32(static_cast<uint32_t>(AddrOffset));
-      break;
-    case 8:
-      O.writeU64(AddrOffset);
-      break;
-    }
+    O.writeUnsigned(AddrOffset, Hdr.AddrOffSize);
   }
 
   // Write out all zeros for the AddrInfoOffsets.
